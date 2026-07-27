@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width:850px;margin:auto;">
+
+    <div class="animate-slide-up page-header-bar mb-4">
+
+        <div class="d-flex align-items-center gap-2">
+
+            <div class="accent-bar"></div>
+
+            <div>
+
+                {% if editar %}
+                    <h1 style="margin:0;">Editar Usuario</h1>
+                    <p style="margin:0;color:#6b7280;">
+                        Actualiza la información del usuario.
+                    </p>
+                {% else %}
+                    <h1 style="margin:0;">Nuevo Usuario</h1>
+                    <p style="margin:0;color:#6b7280;">
+                        Registra un nuevo usuario en Bulls Trucks.
+                    </p>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <a
+            href="{% url 'usuarios:lista_usuarios' %}"
+            class="btn btn-secondary"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Volver
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-4">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                {% if form.errors %}
+
+                    <div class="alert alert-danger">
+
+                        {{ form.errors }}
+
+                    </div>
+
+                {% endif %}
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Tipo de usuario
+                        </label>
+
+                        {{ form.tipo_usuario }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Usuario
+                        </label>
+
+                        {{ form.username }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Correo
+                        </label>
+
+                        {{ form.email }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Nombres
+                        </label>
+
+                        {{ form.first_name }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Apellidos
+                        </label>
+
+                        {{ form.last_name }}
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">
+                    Datos del conductor
+                </h5>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Nombre del conductor
+                        </label>
+
+                        {{ form.nombre_conductor }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Teléfono
+                        </label>
+
+                        {{ form.telefono }}
+
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+
+                        <label class="form-label">
+                            Correo del conductor
+                        </label>
+
+                        {{ form.correo_conductor }}
+
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Contraseña
+                        </label>
+
+                        {{ form.password1 }}
+
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        <label class="form-label">
+                            Confirmar contraseña
+                        </label>
+
+                        {{ form.password2 }}
+
+                    </div>
+
+                </div>
+
+                <div class="text-end mt-4">
+
+                    <button
+                        class="btn btn-primary"
+                        type="submit"
+                    >
+
+                        <i class="bi bi-floppy"></i>
+
+                        {% if editar %}
+                            Actualizar Usuario
+                        {% else %}
+                            Crear Usuario
+                        {% endif %}
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

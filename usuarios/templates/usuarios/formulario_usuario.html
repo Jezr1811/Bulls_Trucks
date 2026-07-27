@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<main class="flex-1">
+
+    <div style="max-width:700px;margin:0 auto;padding:2rem 1.5rem;">
+
+        <!-- Encabezado -->
+
+        <div class="page-header-bar animate-slide-up mb-4">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <div class="accent-bar"></div>
+
+                <div>
+
+                    <h1 style="margin:0;">Nuevo Usuario</h1>
+
+                    <p style="margin:0;color:#6b7280;">
+                        Registra un nuevo usuario del sistema.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="table-card animate-slide-up">
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Usuario
+                        </label>
+
+                        {{ form.username }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Correo
+                        </label>
+
+                        {{ form.email }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Nombres
+                        </label>
+
+                        {{ form.first_name }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Apellidos
+                        </label>
+
+                        {{ form.last_name }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Tipo de usuario
+                        </label>
+
+                        {{ form.tipo_usuario }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Nombre del conductor
+                        </label>
+
+                        {{ form.nombre_conductor }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Teléfono
+                        </label>
+
+                        {{ form.telefono }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Correo del conductor
+                        </label>
+
+                        {{ form.correo_conductor }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Contraseña
+                        </label>
+
+                        {{ form.password1 }}
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Confirmar contraseña
+                        </label>
+
+                        {{ form.password2 }}
+                    </div>
+
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                        href="{% url 'usuarios:lista_usuarios' %}"
+                        class="btn btn-secondary"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn-bulls"
+                    >
+                        <i class="bi bi-person-plus-fill"></i>
+
+                        Crear Usuario
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}

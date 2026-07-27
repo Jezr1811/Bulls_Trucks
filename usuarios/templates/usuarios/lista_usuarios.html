@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<main class="flex-1">
+
+    <div style="max-width:80rem;margin:0 auto;padding:2rem 1.5rem;">
+
+        <!-- Encabezado -->
+
+        <div class="animate-slide-up page-header-bar mb-4">
+
+            <div class="d-flex align-items-center gap-2">
+
+                <div class="accent-bar"></div>
+
+                <div>
+                    <h1 style="margin:0;">Usuarios</h1>
+                    <p style="margin:0;color:#6b7280;">
+                        Gestiona los usuarios del sistema.
+                    </p>
+                </div>
+
+            </div>
+
+            <a
+                href="{% url 'usuarios:crear_usuario' %}"
+                class="btn-bulls"
+                style="text-decoration:none;"
+            >
+                <i class="bi bi-plus-lg"></i>
+                Nuevo Usuario
+            </a>
+
+        </div>
+
+        <div class="table-card animate-slide-up">
+
+            <div style="overflow-x:auto;">
+
+                <table class="vehicles-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Usuario</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th style="width:180px;">Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    {% for usuario in usuarios %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="vehicle-plate-cell">
+
+                                    <div class="vehicle-icon-avatar">
+
+                                        <i class="bi bi-person"></i>
+
+                                    </div>
+
+                                    <span class="vehicle-plate">
+
+                                        {{ usuario.username }}
+
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                {{ usuario.first_name }} {{ usuario.last_name }}
+
+                            </td>
+
+                            <td>
+
+                                {{ usuario.email }}
+
+                            </td>
+
+                            <td>
+
+                                {% if usuario.is_superuser %}
+
+                                    <span class="status-badge status-activo">
+
+                                        <span class="dot"></span>
+
+                                        Administrador
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-mantenimiento">
+
+                                        <span class="dot"></span>
+
+                                        Conductor
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if usuario.is_active %}
+
+                                    <span class="status-badge status-activo">
+
+                                        <span class="dot"></span>
+
+                                        Activo
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-inactivo">
+
+                                        <span class="dot"></span>
+
+                                        Inactivo
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <div class="d-flex gap-2">
+
+                                    <a
+                                        href="{% url 'usuarios:editar_usuario' usuario.id %}"
+                                        class="btn btn-warning btn-sm"
+                                        title="Editar"
+                                    >
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    {% if usuario.is_active %}
+
+                                        <a
+                                            href="{% url 'usuarios:desactivar_usuario' usuario.id %}"
+                                            class="btn btn-danger btn-sm"
+                                            title="Desactivar"
+                                        >
+                                            <i class="bi bi-person-x"></i>
+                                        </a>
+
+                                    {% else %}
+
+                                        <a
+                                            href="{% url 'usuarios:activar_usuario' usuario.id %}"
+                                            class="btn btn-success btn-sm"
+                                            title="Activar"
+                                        >
+                                            <i class="bi bi-person-check"></i>
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="6">
+
+                                <div class="empty-state">
+
+                                    <div class="empty-state-icon">
+
+                                        <i class="bi bi-people"></i>
+
+                                    </div>
+
+                                    <p>
+
+                                        No existen usuarios registrados.
+
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+{% endblock %}

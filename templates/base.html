@@ -193,7 +193,12 @@
                 Dashboard
             </a>
 
-            {% if request.user.is_superuser %}
+             {% if request.user.is_superuser %}
+                 <a class="menu-link" href="{% url 'usuarios:crear_usuario' %}">
+                    <i class="bi bi-person-plus-fill"></i>
+                    Usuarios
+                </a>
+
                 <a class="menu-link" href="{% url 'conductores:lista_conductores' %}">
                     <i class="bi bi-person-fill"></i>
                     Conductores
