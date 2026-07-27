@@ -1,17 +1,44 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
+
+from usuarios.decorators import admin_required
+from documentos.models import Documento
 
 from .models import Conductor
 from .forms import ConductorForm
-# Importamos el decorador personalizado para restringir el acceso total a conductores
-from usuarios.decorators import admin_required
 
 
 @login_required
-@admin_required  # BLOQUEO TOTAL: Solo el administrador puede auditar la nómina de conductores
+@admin_required
 def lista_conductores(request):
-    conductores = Conductor.objects.all().order_by("-id")
+    buscar = request.GET.get("buscar", "").strip()
+    estado = request.GET.get("estado", "").strip()
+
+    conductores_qs = Conductor.objects.all().order_by("-id")
+
+    if buscar:
+        conductores_qs = conductores_qs.filter(
+            Q(nombre__icontains=buscar) |
+            Q(correo__icontains=buscar) |
+            Q(telefono__icontains=buscar)
+        )
+
+    if estado in ["activo", "inactivo"]:
+        conductores_qs = conductores_qs.filter(estado=estado)
+
+    conductores = list(conductores_qs)
+
+    licencias = Documento.objects.filter(
+        conductor__in=conductores,
+        tipo="licencia"
+    ).select_related("conductor")
+
+    licencias_por_conductor = {doc.conductor_id: doc for doc in licencias}
+
+    for conductor in conductores:
+        conductor.documento_licencia = licencias_por_conductor.get(conductor.id)
 
     return render(
         request,
@@ -23,7 +50,7 @@ def lista_conductores(request):
 
 
 @login_required
-@admin_required  # BLOQUEO TOTAL: Registrar nuevos empleados es una tarea puramente administrativa
+@admin_required
 def crear_conductor(request):
     if request.method == "POST":
         form = ConductorForm(request.POST)
@@ -45,7 +72,7 @@ def crear_conductor(request):
 
 
 @login_required
-@admin_required  # BLOQUEO TOTAL: Modificar licencias o estados críticos es solo para el Administrador
+@admin_required
 def editar_conductor(request, pk):
     conductor = get_object_or_404(Conductor, pk=pk)
 
@@ -70,7 +97,7 @@ def editar_conductor(request, pk):
 
 
 @login_required
-@admin_required  # BLOQUEO TOTAL: Desvincular un conductor es una acción crítica protegida
+@admin_required
 def eliminar_conductor(request, pk):
     conductor = get_object_or_404(Conductor, pk=pk)
 
