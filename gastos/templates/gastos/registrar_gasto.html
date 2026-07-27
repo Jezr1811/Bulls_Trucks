@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 0 auto; padding-bottom: 50px;">
+    <h4 class="text-center fw-bold my-4 text-dark">Registro de Gasto</h4>
+
+    {% if form.errors %}
+        <div class="alert alert-danger rounded-4 shadow-sm mb-4">
+            <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill"></i> Por favor, corrige los siguientes errores:</h6>
+            <ul class="mb-0 ps-3 small">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field|capfirst }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-3">
+        {% csrf_token %}
+
+        <div>
+            <label class="form-label fw-bold small text-dark ms-2 mb-1">Tipo de gasto:</label>
+            <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                <select name="tipo" class="form-control bg-transparent border-0 p-0 text-dark" style="outline: none; box-shadow: none;" required>
+                    <option value="">Selecciona el tipo</option>
+                    <option value="combustible" {% if form.tipo.value == 'combustible' %}selected{% endif %}>Combustible</option>
+                    <option value="peaje" {% if form.tipo.value == 'peaje' %}selected{% endif %}>Peaje</option>
+                    <option value="alimentacion" {% if form.tipo.value == 'alimentacion' %}selected{% endif %}>Alimentación</option>
+                    <option value="hospedaje" {% if form.tipo.value == 'hospedaje' %}selected{% endif %}>Hospedaje</option>
+                    <option value="mantenimiento" {% if form.tipo.value == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                    <option value="otro" {% if form.tipo.value == 'otro' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label fw-bold small text-dark ms-2 mb-1">Valor del gasto:</label>
+            <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                <span class="text-secondary me-2">$</span>
+                <input type="number" step="0.01" name="valor" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Monto" value="{{ form.valor.value|default:'' }}" required>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label fw-bold small text-dark ms-2 mb-1">Fecha de gasto:</label>
+            <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                <input type="date" name="fecha" class="form-control bg-transparent border-0 p-0 text-dark" value="{% if form.fecha.value %}{{ form.fecha.value|date:'Y-m-d'|default:form.fecha.value }}{% endif %}" required>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label fw-bold small text-dark ms-2 mb-1">Descripción de gasto:</label>
+            <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 20px;">
+                <textarea name="descripcion" rows="2" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Descripción (Opcional)" style="outline: none; box-shadow: none; resize: none;">{{ form.descripcion.value|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div>
+            <label class="form-label fw-bold small text-dark ms-2 mb-1">Recibo (Opcional)</label>
+            {% if form.instance.recibo %}
+                <div class="mb-2 ms-2 small text-muted">
+                    Archivo actual: <a href="{{ form.instance.recibo.url }}" target="_blank">{{ form.instance.recibo.name }}</a>
+                </div>
+            {% endif %}
+            <label class="btn btn-dark w-100 rounded-pill py-2 d-flex align-items-center justify-content-center gap-2" style="background-color: #000000; border: none; cursor: pointer;">
+                📸 Agregar/Cambiar Foto
+                <input type="file" name="recibo" class="d-none">
+            </label>
+        </div>
+
+        <div class="card border-0 rounded-4 p-3 mt-3 shadow-sm" style="background-color: #e5e7eb;">
+            <h6 class="text-center fw-bold text-dark mb-3">Mis Gastos Registrados</h6>
+            <div class="d-flex flex-column gap-2" style="font-size: 0.95rem;">
+                {% for g in viaje.gasto_set.all %}
+                    <div class="d-flex justify-content-between border-bottom pb-1 border-white">
+                        <div>
+                            <span class="fw-bold text-dark text-capitalize">{{ g.get_tipo_display }}</span><br>
+                            <small class="text-muted">{{ g.fecha|date:"d/m/Y" }}</small>
+                        </div>
+                        <span class="fw-bold text-dark align-self-center">${{ g.valor }}</span>
+                    </div>
+                {% empty %}
+                    <div class="text-center text-muted small py-2">No hay gastos registrados en este viaje.</div>
+                {% endfor %}
+                <div class="d-flex justify-content-between fw-bold pt-2 fs-6">
+                    <span>Total:</span>
+                    <span class="fw-bolder">${{ viaje.total_gastos }}</span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold mt-3 shadow" style="background-color: #000000; border: none;">
+            Guardar
+        </button>
+    </form>
+</div>
+{% endblock %}

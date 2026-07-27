@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Registrar Documento
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-8 col-lg-9">
+
+            <div class="card border-0 shadow-lg rounded-5">
+
+                <div class="card-body p-5">
+
+                    <!-- Encabezado -->
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div class="d-flex align-items-center">
+
+                            <div class="bg-light border rounded-3 p-2 me-3">
+                                <i class="bi bi-plus-lg fs-3"></i>
+                            </div>
+
+                            <div>
+
+                                <h3 class="fw-bold mb-1">
+                                    Registrar Nuevo Documento
+                                </h3>
+
+                                <small class="text-muted">
+                                    Asocia un documento a un viaje, vehículo o conductor.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <a href="{% url 'documentos:lista_documentos' %}"
+                           class="btn btn-outline-secondary rounded-pill px-4">
+
+                            <i class="bi bi-arrow-left"></i>
+                            Regresar
+
+                        </a>
+
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <!-- Viaje -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Asociar a un viaje
+                            </label>
+
+                            {{ form.viaje }}
+
+                        </div>
+
+                        <!-- Vehículo / Conductor -->
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Vehículo
+                                </label>
+
+                                {{ form.vehiculo }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Conductor
+                                </label>
+
+                                {{ form.conductor }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Tipo / Número -->
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Tipo
+                                </label>
+
+                                {{ form.tipo }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Número
+                                </label>
+
+                                {{ form.numero }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Fechas -->
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Fecha expedición
+                                </label>
+
+                                {{ form.fecha_expedicion }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="form-label fw-semibold">
+                                    Fecha vencimiento
+                                </label>
+
+                                {{ form.fecha_vencimiento }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Observaciones -->
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Observaciones
+                            </label>
+
+                            {{ form.observaciones }}
+
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3">
+
+                            <i class="bi bi-paperclip me-2"></i>
+
+                            Imagen o PDF del documento
+
+                        </h5>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label for="id_imagen"
+                                       class="btn btn-dark rounded-pill w-100 py-3">
+
+                                    <i class="bi bi-image"></i>
+                                    Seleccionar imagen
+
+                                </label>
+
+                                {{ form.imagen }}
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label for="id_archivo_pdf"
+                                       class="btn btn-dark rounded-pill w-100 py-3">
+
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                    Seleccionar PDF
+
+                                </label>
+
+                                {{ form.archivo_pdf }}
+
+                            </div>
+
+                        </div>
+
+                        <!-- Botones -->
+
+                        <div class="row mt-4">
+
+                            <div class="col-md-4 mb-3">
+
+                                <a href="{% url 'documentos:lista_documentos' %}"
+                                   class="btn btn-outline-secondary rounded-pill w-100 py-3">
+
+                                    Cancelar
+
+                                </a>
+
+                            </div>
+
+                            <div class="col-md-8 mb-3">
+
+                                <button type="submit"
+                                        class="btn btn-dark rounded-pill w-100 py-3 fw-bold">
+
+                                    <i class="bi bi-check-circle me-2"></i>
+
+                                    GUARDAR DOCUMENTO
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

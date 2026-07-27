@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    /* ============ VARIABLES ============ */
+    :root {
+        --bg: #f4f6f9;
+        --fg: #1f2937;
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --border: #eef2f7;
+        --danger: #ef4444;
+        --muted: #6b7280;
+    }
+
+    /* ============ ANIMACIONES ============ */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(.92) translateY(10px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+
+    .animate-slide-up { animation: slideUp .5s cubic-bezier(.22,1,.36,1) forwards; }
+    .animate-scale-in { animation: scaleIn .3s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ PÁGINA ============ */
+    .page-wrapper {
+        padding: 2rem 1.5rem;
+        max-width: 82rem;
+        margin: 0 auto;
+    }
+
+    /* ============ ENCABEZADO ============ */
+    .page-header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        animation: slideUp .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @media (min-width: 640px) {
+        .page-header {
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+    }
+
+    .accent-bar {
+        width: 5px;
+        height: 2rem;
+        border-radius: 99px;
+        background: #374151;
+        flex-shrink: 0;
+    }
+
+    .page-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin: 0;
+        letter-spacing: -.03em;
+        line-height: 1.15;
+    }
+
+    .page-subtitle {
+        font-size: .88rem;
+        color: var(--muted);
+        margin: .2rem 0 0;
+    }
+
+    .btn-new {
+        background: #1f2937;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: .65rem 1.4rem;
+        font-weight: 600;
+        font-size: .875rem;
+        text-decoration: none;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        white-space: nowrap;
+    }
+    .btn-new:hover {
+        background: #374151;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .btn-new:active { transform: translateY(0); }
+
+    /* ============ TABLA CARD ============ */
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        border: 1px solid var(--border);
+        animation: slideUp .5s cubic-bezier(.22,1,.36,1) .1s forwards;
+        opacity: 0;
+    }
+
+    /* ============ BARRA DE BÚSQUEDA ============ */
+    .table-toolbar {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        background: #fafafa;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+    }
+    .search-box .bi-search {
+        position: absolute;
+        left: .85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        font-size: .85rem;
+        pointer-events: none;
+    }
+
+    .search-input {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: .55rem .9rem .55rem 2.4rem;
+        font-size: .875rem;
+        background: #fff;
+        transition: border-color .2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .search-input:focus {
+        border-color: #9ca3af;
+        outline: none;
+    }
+
+    .filter-select {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: .55rem .9rem;
+        font-size: .875rem;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color .2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .filter-select:focus {
+        border-color: #9ca3af;
+        outline: none;
+    }
+
+    /* ============ TABLA ============ */
+    .custom-table {
+        margin: 0;
+        border-collapse: collapse;
+        font-size: .875rem;
+        width: 100%;
+    }
+
+    .custom-table thead {
+        background: #f9fafb;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .custom-table th {
+        font-size: .7rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: .85rem 1.25rem;
+        border: none;
+        white-space: nowrap;
+    }
+    .custom-table th:last-child { text-align: right; }
+
+    .custom-table td {
+        padding: .9rem 1.25rem;
+        vertical-align: middle;
+        border-top: 1px solid #f3f4f6;
+        border-bottom: none;
+    }
+    .custom-table td:last-child { text-align: right; }
+
+    .custom-table tbody tr {
+        transition: background .15s;
+    }
+    .custom-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    /* Celda placa e ícono neutro */
+    .plate-cell {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+    }
+    .plate-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        color: #4b5563;
+        font-size: .95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        border: 1px solid #e5e7eb;
+    }
+    .plate-text {
+        font-weight: 600;
+        color: var(--fg);
+        letter-spacing: .02em;
+    }
+
+    /* Badges neutros */
+    .tipo-badge, .capacity-badge, .km-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        font-size: .78rem;
+        font-weight: 500;
+        padding: .25rem .65rem;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    .tipo-badge i, .capacity-badge i, .km-badge i { 
+        font-size: .7rem; 
+        color: #6b7280; 
+    }
+
+    /* ============ BADGES DE ESTADO ============ */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        font-size: .78rem;
+        font-weight: 500;
+        padding: .25rem .65rem;
+        border-radius: 99px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        white-space: nowrap;
+    }
+    .status-badge .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    .badge-activo .dot { background: #16a34a; }
+    .badge-mantenimiento .dot { background: #f59e0b; }
+    .badge-inactivo .dot { background: #9ca3af; }
+    .badge-fuera-servicio .dot { background: #dc2626; }
+
+    /* ============ BOTONES DE ACCIÓN (CON COLOR) ============ */
+    .action-btn {
+        text-decoration: none;
+        padding: .35rem .7rem;
+        border-radius: 6px;
+        font-size: .78rem;
+        font-weight: 600;
+        transition: all .15s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        cursor: pointer;
+    }
+
+    /* Botón Editar - Azul */
+    .edit-btn {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #dbeafe;
+    }
+    .edit-btn:hover {
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+
+    /* Botón Eliminar - Rojo */
+    .delete-btn {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fee2e2;
+    }
+    .delete-btn:hover {
+        background: #fee2e2;
+        color: #b91c1c;
+        border-color: #fca5a5;
+    }
+
+    /* ============ FOOTER TABLA ============ */
+    .table-footer {
+        padding: .75rem 1.25rem;
+        border-top: 1px solid var(--border);
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .75rem;
+        color: var(--muted);
+    }
+    .table-footer .page-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        font-size: .75rem;
+        font-weight: 600;
+        cursor: default;
+        transition: all .15s;
+    }
+    .page-btn-active {
+        background: #374151;
+        color: #fff;
+    }
+    .page-btn-disabled {
+        background: transparent;
+        color: #d1d5db;
+    }
+
+    /* ============ ESTADO VACÍO ============ */
+    .empty-state {
+        padding: 4rem 1rem;
+        text-align: center;
+    }
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .empty-icon i { font-size: 1.4rem; color: #9ca3af; }
+    .empty-title {
+        color: #374151;
+        font-weight: 600;
+        font-size: .95rem;
+        margin: 0 0 .25rem;
+    }
+    .empty-desc {
+        color: #9ca3af;
+        font-size: .85rem;
+        margin: 0;
+    }
+
+    /* ============ MODAL ELIMINAR ============ */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(17,24,39,.4);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,.15);
+        width: 100%;
+        max-width: 400px;
+        padding: 1.75rem;
+        text-align: center;
+    }
+
+    .delete-icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #fef2f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .delete-icon-circle i { font-size: 1.2rem; color: #dc2626; }
+
+    .modal-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--fg);
+        margin: 0 0 .35rem;
+    }
+
+    .modal-msg {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: 0 0 1.25rem;
+        line-height: 1.5;
+    }
+
+    .btn-modal-cancel {
+        flex: 1;
+        padding: .55rem 1rem;
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 500;
+        color: #374151;
+        background: transparent;
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-modal-cancel:hover { background: #f3f4f6; }
+
+    .btn-modal-delete {
+        flex: 1;
+        padding: .55rem 1rem;
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 600;
+        color: #fff;
+        background: #dc2626;
+        border: none;
+        cursor: pointer;
+        transition: background .15s;
+    }
+    .btn-modal-delete:hover {
+        background: #b91c1c;
+    }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed;
+        top: 90px;
+        right: 1rem;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        padding: .75rem 1rem;
+        min-width: 260px;
+        max-width: 380px;
+        border: 1px solid #e5e7eb;
+        font-size: .85rem;
+        color: #374151;
+    }
+    .toast-dismiss {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        font-size: .85rem;
+        padding: 2px;
+    }
+    .toast-dismiss:hover { color: #374151; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 991.98px) {
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5) {
+            display: none;
+        }
+    }
+    @media (max-width: 767.98px) {
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4) {
+            display: none;
+        }
+    }
+    @media (max-width: 575.98px) {
+        .page-title { font-size: 1.5rem; }
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3) {
+            display: none;
+        }
+        .action-btn span { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+
+<!-- ============ TOAST CONTAINER ============ -->
+<div id="toast-container" aria-live="polite"></div>
+
+<!-- ============ CONTENIDO PRINCIPAL ============ -->
+<div class="page-wrapper">
+
+    <!-- Encabezado -->
+    <div class="page-header">
+        <div class="d-flex align-items-center gap-2">
+            <div class="accent-bar"></div>
+            <div>
+                <h1 class="page-title">Trailers</h1>
+                <p class="page-subtitle">Gestiona todos los trailers registrados</p>
+            </div>
+        </div>
+        <a href="{% url 'trailers:crear_trailer' %}" class="btn-new">
+            <i class="bi bi-plus-lg"></i>
+            Nuevo Trailer
+        </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-card">
+
+        <!-- Barra de búsqueda y filtro -->
+        <div class="table-toolbar">
+            <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="text"
+                        id="search-input"
+                        class="search-input"
+                        placeholder="Buscar por placa o tipo..."
+                        oninput="filterTrailers()"
+                        aria-label="Buscar trailer"
+                    >
+                </div>
+                <select id="status-filter" class="filter-select" onchange="filterTrailers()" aria-label="Filtrar por estado">
+                    <option value="all">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="inactivo">Inactivo</option>
+                    <option value="fuera de servicio">Fuera de Servicio</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="custom-table" id="trailers-table">
+                <thead>
+                    <tr>
+                        <th>Placa</th>
+                        <th>Tipo</th>
+                        <th>Capacidad</th>
+                        <th>Kilometraje</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="trailers-tbody">
+                    {% for trailer in trailers %}
+                    <tr data-placa="{{ trailer.placa|lower }}" data-tipo="{{ trailer.tipo|lower }}" data-estado="{{ trailer.estado|lower }}">
+                        <td>
+                            <div class="plate-cell">
+                                <div class="plate-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <span class="plate-text">{{ trailer.placa }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="tipo-badge">
+                                <i class="bi bi-tag"></i>
+                                {{ trailer.tipo }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="capacity-badge">
+                                <i class="bi bi-weight-hanging"></i>
+                                {{ trailer.capacidad }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="km-badge">
+                                <i class="bi bi-speedometer2"></i>
+                                {{ trailer.kilometraje }} km
+                            </span>
+                        </td>
+                        <td>
+                            {% if trailer.estado|lower == "activo" %}
+                                <span class="status-badge badge-activo"><span class="dot"></span>Activo</span>
+                            {% elif trailer.estado|lower == "mantenimiento" %}
+                                <span class="status-badge badge-mantenimiento"><span class="dot"></span>Mantenimiento</span>
+                            {% elif trailer.estado|lower == "inactivo" %}
+                                <span class="status-badge badge-inactivo"><span class="dot"></span>Inactivo</span>
+                            {% elif trailer.estado|lower == "fuera de servicio" %}
+                                <span class="status-badge badge-fuera-servicio"><span class="dot"></span>Fuera de Servicio</span>
+                            {% else %}
+                                <span class="status-badge badge-inactivo"><span class="dot"></span>{{ trailer.estado }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                <a href="{% url 'trailers:editar_trailer' trailer.id %}" class="action-btn edit-btn" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Editar</span>
+                                </a>
+                                <form id="delete-form-{{ trailer.id }}" action="{% url 'trailers:eliminar_trailer' trailer.id %}" method="POST" style="display:inline;margin:0;padding:0;">
+                                    {% csrf_token %}
+                                    <button type="button" class="action-btn delete-btn" title="Eliminar" onclick="openDeleteModal({{ trailer.id }}, '{{ trailer.placa }}')">
+                                        <i class="bi bi-trash3"></i>
+                                        <span>Eliminar</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="empty-row">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <p class="empty-title">No existen trailers registrados</p>
+                                <p class="empty-desc">Presiona "Nuevo Trailer" para crear el primero</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Resultado vacío por filtro -->
+        <div id="filter-empty" class="empty-state" style="display:none;">
+            <div class="empty-icon">
+                <i class="bi bi-search"></i>
+            </div>
+            <p class="empty-title">No se encontraron trailers</p>
+            <p class="empty-desc">Intenta con otro término de búsqueda</p>
+        </div>
+
+        <!-- Footer -->
+        {% if trailers %}
+        <div class="table-footer" id="table-footer">
+            <span id="table-count">Mostrando {{ trailers.count }} trailer(es)</span>
+            <div class="d-flex align-items-center gap-1">
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página anterior">
+                    <i class="bi bi-chevron-left" style="font-size:.7rem;"></i>
+                </button>
+                <button class="page-btn page-btn-active" aria-label="Página 1">1</button>
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página siguiente">
+                    <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- ============ MODAL: CONFIRMAR ELIMINACIÓN ============ -->
+<div id="delete-overlay" class="modal-overlay" role="dialog" aria-modal="true">
+    <div id="delete-content" class="modal-box animate-scale-in">
+        <div class="delete-icon-circle">
+            <i class="bi bi-trash3"></i>
+        </div>
+        <h3 class="modal-title">Eliminar Trailer</h3>
+        <p class="modal-msg" id="delete-msg">¿Estás seguro de eliminar este trailer? Esta acción no se puede deshacer.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <button onclick="closeDeleteModal()" class="btn-modal-cancel">Cancelar</button>
+            <button onclick="confirmDelete()" class="btn-modal-delete">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Búsqueda y filtros en tiempo real
+    function filterTrailers() {
+        const query = document.getElementById('search-input').value.toLowerCase().trim();
+        const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+        const rows = document.querySelectorAll('#trailers-tbody tr[data-placa]');
+        const filterEmpty = document.getElementById('filter-empty');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const placa = row.getAttribute('data-placa') || '';
+            const tipo = row.getAttribute('data-tipo') || '';
+            const estado = row.getAttribute('data-estado') || '';
+
+            const matchSearch = !query || placa.includes(query) || tipo.includes(query);
+            const matchStatus = statusFilter === 'all' || estado === statusFilter;
+
+            if (matchSearch && matchStatus) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const emptyRow = document.getElementById('empty-row');
+        const hasDjangoData = !emptyRow;
+
+        if (hasDjangoData && filterEmpty) {
+            filterEmpty.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        const countEl = document.getElementById('table-count');
+        if (countEl) {
+            countEl.textContent = 'Mostrando ' + visibleCount + ' trailer(es)';
+        }
+    }
+
+    // Modal: Eliminar
+    let deleteTargetFormId = null;
+
+    function openDeleteModal(formId, placa) {
+        deleteTargetFormId = 'delete-form-' + formId;
+        document.getElementById('delete-msg').textContent =
+            '¿Estás seguro de eliminar el trailer "' + placa + '"? Esta acción no se puede deshacer.';
+        const overlay = document.getElementById('delete-overlay');
+        overlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDeleteModal() {
+        const overlay = document.getElementById('delete-overlay');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+        deleteTargetFormId = null;
+    }
+
+    function confirmDelete() {
+        if (deleteTargetFormId) {
+            const form = document.getElementById(deleteTargetFormId);
+            if (form) {
+                form.submit();
+                return;
+            }
+        }
+        closeDeleteModal();
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDeleteModal();
+    });
+    document.getElementById('delete-overlay').addEventListener('click', function(e) {
+        if (e.target === e.currentTarget) closeDeleteModal();
+    });
+
+    // Toasts
+    function showToast(message, type) {
+        type = type || 'info';
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter';
+        toast.innerHTML = '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            showToast('{{ message|escapejs }}', 'info');
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

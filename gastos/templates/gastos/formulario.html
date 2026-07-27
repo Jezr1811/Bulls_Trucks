@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+Gasto
+{% endblock %}
+
+{% block content %}
+
+<h1>Formulario de Gasto</h1>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit">
+        Guardar
+    </button>
+
+    <a href="{% url 'gastos:lista_gastos' %}">
+        Cancelar
+    </a>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %} Detalle Mantenimiento {% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="text-center mb-4">
+                <h2 class="fw-bold text-dark m-0">Mantenimiento Realizado</h2>
+            </div>
+
+            <div class="card border-0 rounded-4 bg-light p-4 mb-4 shadow-sm">
+                <div class="card-body p-1 text-dark">
+                    <h4 class="fw-bold mb-4 border-bottom pb-2 text-secondary">{{ mantenimiento.nombre_mantenimiento }}</h4>
+                    
+                    <div class="d-flex flex-column gap-3 fs-6">
+                        <div><strong>Vehículo:</strong> <span class="fw-semibold ms-1">{{ mantenimiento.vehiculo|default:"XXX 123" }}</span></div>
+                        <div><strong>Fecha:</strong> <span class="fw-semibold ms-1">{{ mantenimiento.fecha|date:"d/m/Y" }}</span></div>
+                        <div><strong>Valor:</strong> <span class="fw-semibold ms-1 text-success">${{ mantenimiento.valor }}</span></div>
+                        
+                        <div><strong>Kilometraje (Que dura el mantenimiento):</strong> <span class="fw-semibold ms-1">{{ mantenimiento.km_duracion }} Km</span></div>
+                        <div><strong>Kilometraje (A la hora de realizar el mantenimiento):</strong> <span class="fw-semibold ms-1">{{ mantenimiento.km_actual }} Km</span></div>
+                        
+                        <div>
+                            <strong>Kilometraje (A la hora de realizar el siguiente cambio):</strong> 
+                            <span class="fw-bold text-primary ms-1">
+                                {{ mantenimiento.km_actual|add:mantenimiento.km_duracion }} Km
+                            </span>
+                        </div>
+                        
+                        <div class="mt-2">
+                            <strong>Descripción Breve:</strong>
+                            <p class="text-muted small bg-white p-2.5 rounded-3 border mt-1 mb-0">{{ mantenimiento.descripcion|default:"Sin descripción adicional." }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="fw-bold text-dark mb-2 ps-1">Imagen del mantenimiento</h5>
+                <div class="rounded-4 overflow-hidden bg-black d-flex align-items-center justify-content-center shadow-sm" style="min-height: 250px;">
+                    {% if mantenimiento.imagen %}
+                        <img src="{{ mantenimiento.imagen.url }}" alt="Evidencia Mantenimiento" class="img-fluid w-100" style="object-fit: cover; max-height: 400px;">
+                    {% else %}
+                        <div class="text-center text-white-50 p-4">
+                            <span class="fs-1 d-block mb-2">🖼️</span>
+                            <span class="small d-block">No se adjuntó ninguna imagen o factura para este mantenimiento.</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-grid mt-4">
+                <a href="{% url 'mantenimientos:lista_mantenimientos' %}" class="btn btn-dark rounded-pill py-2.5 fw-bold text-center shadow-sm" style="background-color: #000; letter-spacing: 0.5px;">
+                    Volver
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

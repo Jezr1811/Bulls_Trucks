@@ -1,0 +1,795 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+
+    :root {
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --accent-light: #e0f2fe;
+        --border: #eef2f7;
+        --success: #16a34a;
+        --danger: #ef4444;
+        --warning: #d97706;
+        --muted: #9ca3af;
+        --fg: #1f2937;
+    }
+
+    /* ============ PAGE ============ */
+    .report-page {
+        max-width: 88rem;
+        margin: 0 auto;
+        padding: 1.75rem 1rem 4rem;
+    }
+    @media (min-width: 768px) {
+        .report-page { padding: 2rem 2.5rem 4rem; }
+    }
+
+    /* ============ HEADER ============ */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        margin-bottom: 1.75rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .accent-bar {
+        width: 6px;
+        height: 2.25rem;
+        border-radius: 99px;
+        background: linear-gradient(to bottom, #f97316, #ea580c);
+        flex-shrink: 0;
+    }
+    .page-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin: 0;
+        letter-spacing: -.03em;
+        line-height: 1.15;
+    }
+    .page-header p {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: .15rem 0 0;
+    }
+
+    /* ============ METRIC CARDS ============ */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .05s forwards;
+        opacity: 0;
+    }
+    @media (max-width: 991.98px) {
+        .metrics-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 575.98px) {
+        .metrics-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.07);
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .metric-card.card-total::before { background: linear-gradient(90deg, #2F80ED, #60a5fa); }
+    .metric-card.card-inversion::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .metric-card.card-promedio::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .metric-card.card-distribucion::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        margin-bottom: .85rem;
+    }
+    .card-total .metric-icon { background: #eff6ff; color: #2F80ED; }
+    .card-inversion .metric-icon { background: #fef2f2; color: #ef4444; }
+    .card-promedio .metric-icon { background: #fffbeb; color: #d97706; }
+    .card-distribucion .metric-icon { background: #f5f3ff; color: #7c3aed; }
+
+    .metric-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--muted);
+        margin-bottom: .3rem;
+        display: block;
+    }
+    .metric-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin-bottom: .4rem;
+        letter-spacing: -.02em;
+        animation: countUp .5s ease forwards;
+    }
+    .metric-subtext {
+        font-size: .75rem;
+        color: #c9cdd4;
+        display: block;
+    }
+
+    /* Distribución especial */
+    .dist-row {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .35rem;
+    }
+    .dist-row:last-child { margin-bottom: 0; }
+    .dist-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        border: 1px solid;
+    }
+    .dist-vehiculo {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+    }
+    .dist-trailer {
+        background: #f5f3ff;
+        color: #6d28d9;
+        border-color: #ddd6fe;
+    }
+    .dist-badge i { font-size: .7rem; }
+    .dist-count {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 800;
+        font-size: .85rem;
+        color: var(--fg);
+    }
+
+    /* ============ TABLE CARD ============ */
+    .table-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        overflow: hidden;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .1s forwards;
+        opacity: 0;
+    }
+
+    .table-card-header {
+        padding: 1.15rem 1.35rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .header-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #c2410c, #ea580c);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    .table-card-header h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--fg);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        flex-wrap: wrap;
+    }
+
+    /* Search */
+    .table-search {
+        position: relative;
+    }
+    .table-search .bi-search {
+        position: absolute;
+        left: .7rem; top: 50%; transform: translateY(-50%);
+        color: #d1d5db; font-size: .8rem; pointer-events: none;
+    }
+    .table-search input {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem .4rem 2rem;
+        font-size: .82rem;
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+        width: 210px;
+    }
+    .table-search input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    /* Filter select */
+    .filter-select {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem;
+        font-size: .82rem;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    /* ============ TABLA ============ */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .85rem;
+    }
+
+    .custom-table thead {
+        background: rgba(248,250,252,.8);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .custom-table th {
+        font-size: .68rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: .8rem 1.15rem;
+        border: none;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .custom-table td {
+        padding: .8rem 1.15rem;
+        vertical-align: middle;
+        border-top: 1px solid #f3f6fa;
+        color: #4b5563;
+    }
+
+    .custom-table tbody tr {
+        transition: background .15s, box-shadow .15s;
+    }
+    .custom-table tbody tr:hover {
+        background: #fffaf5;
+        box-shadow: inset 3px 0 0 #ea580c;
+    }
+
+    /* ID del mantenimiento */
+    .mant-id {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .mant-id i { font-size: .6rem; color: #c2410c; }
+
+    /* Nombre mantenimiento */
+    .mant-name {
+        font-weight: 600;
+        color: var(--fg);
+    }
+
+    /* Badge asociado */
+    .asociado-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        font-size: .75rem;
+        font-weight: 600;
+        padding: .25rem .65rem;
+        border-radius: 99px;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+    .asociado-badge .dot {
+        width: 5px; height: 5px; border-radius: 50%;
+    }
+    .asociado-vehiculo {
+        background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;
+    }
+    .asociado-vehiculo .dot { background: #3b82f6; }
+    .asociado-trailer {
+        background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe;
+    }
+    .asociado-trailer .dot { background: #7c3aed; }
+    .asociado-none {
+        background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb;
+    }
+    .asociado-none .dot { background: #d1d5db; }
+    .asociado-badge i { font-size: .7rem; }
+
+    /* Km badges */
+    .km-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    .km-actual {
+        background: #f0f9ff;
+        border: 1px solid #bae6fd;
+        color: #0369a1;
+    }
+    .km-proximo {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        color: #047857;
+    }
+    .km-badge i { font-size: .6rem; }
+
+    /* Costo */
+    .costo-value {
+        font-weight: 700;
+        color: #b91c1c;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: .88rem;
+    }
+
+    /* Anexo */
+    .anexo-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        color: #6b7280;
+        text-decoration: none;
+        transition: all .15s;
+    }
+    .anexo-link:hover {
+        background: #eff6ff;
+        color: #2F80ED;
+    }
+    .anexo-link i { font-size: .95rem; }
+    .anexo-empty {
+        color: #e5e7eb;
+        font-size: .85rem;
+    }
+
+    /* Footer */
+    .table-footer {
+        padding: .7rem 1.15rem;
+        border-top: 1px solid var(--border);
+        background: rgba(248,249,250,.4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .75rem;
+        color: var(--muted);
+    }
+    .table-footer .page-btn {
+        width: 30px; height: 30px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        border: none; font-size: .75rem; font-weight: 600;
+    }
+    .page-btn-active { background: #ea580c; color: #fff; }
+    .page-btn-disabled { background: transparent; color: #d1d5db; }
+
+    /* Empty state */
+    .empty-state {
+        padding: 3.5rem 1rem;
+        text-align: center;
+    }
+    .empty-icon {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: #fff7ed;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .empty-icon i { font-size: 1.5rem; color: #fdba74; }
+    .empty-title { color: #6b7280; font-weight: 600; font-size: .95rem; margin: 0 0 .3rem; }
+    .empty-desc { color: #d1d5db; font-size: .82rem; margin: 0; }
+
+    #filter-empty { display: none; }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed; top: 90px; right: 1rem; z-index: 9999;
+        display: flex; flex-direction: column; gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex; align-items: center; gap: .65rem;
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
+        border-left: 4px solid; font-size: .85rem; color: #374151;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-dismiss {
+        background: none; border: none; color: #d1d5db;
+        cursor: pointer; font-size: .85rem; padding: 2px;
+        transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 991.98px) {
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5) { display: none; }
+    }
+    @media (max-width: 767.98px) {
+        .custom-table th:nth-child(6),
+        .custom-table td:nth-child(6) { display: none; }
+        .table-search input { width: 160px; }
+    }
+    @media (max-width: 575.98px) {
+        .page-header h1 { font-size: 1.5rem; }
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4) { display: none; }
+        .header-right { width: 100%; }
+        .table-search input { width: 100%; }
+        .table-search { flex: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<div class="report-page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="accent-bar"></div>
+        <div>
+            <h1>Reporte de Mantenimiento</h1>
+            <p>Historial y costos de mantenimientos realizados</p>
+        </div>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card card-total">
+            <div class="metric-icon"><i class="bi bi-tools"></i></div>
+            <span class="metric-label">Total Mantenimientos</span>
+            <div class="metric-value">{{ total_mantenimientos|default:0 }}</div>
+            <span class="metric-subtext">Registros acumulados</span>
+        </div>
+        <div class="metric-card card-inversion">
+            <div class="metric-icon"><i class="bi bi-cash-coin"></i></div>
+            <span class="metric-label">Inversión Total</span>
+            <div class="metric-value">${{ costo_total|floatformat:0|intcomma }}</div>
+            <span class="metric-subtext">Costo total de reparaciones</span>
+        </div>
+        <div class="metric-card card-promedio">
+            <div class="metric-icon"><i class="bi bi-calculator"></i></div>
+            <span class="metric-label">Costo Promedio</span>
+            <div class="metric-value">${{ costo_promedio|floatformat:0|intcomma }}</div>
+            <span class="metric-subtext">Por mantenimiento realizado</span>
+        </div>
+        <div class="metric-card card-distribucion">
+            <div class="metric-icon"><i class="bi bi-pie-chart"></i></div>
+            <span class="metric-label">Distribución de Equipos</span>
+            <div style="padding-top:.35rem;">
+                <div class="dist-row">
+                    <span class="dist-badge dist-vehiculo"><i class="bi bi-truck"></i> Vehículos</span>
+                    <span class="dist-count">{{ mantenimientos_vehiculos }}</span>
+                </div>
+                <div class="dist-row">
+                    <span class="dist-badge dist-trailer"><i class="bi bi-box-seam"></i> Trailers</span>
+                    <span class="dist-count">{{ mantenimientos_trailers }}</span>
+                </div>
+            </div>
+            <span class="metric-subtext" style="margin-top:.5rem;">Vehículos vs Trailers</span>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div class="header-left">
+                <div class="header-icon"><i class="bi bi-clipboard-data"></i></div>
+                <h3>Historial de Mantenimientos</h3>
+            </div>
+            <div class="header-right">
+                <div class="table-search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="table-search" placeholder="Buscar mantenimiento..." oninput="filterTable()" aria-label="Buscar mantenimiento">
+                </div>
+                <select id="asociado-filter" class="filter-select" onchange="filterTable()" aria-label="Filtrar por tipo">
+                    <option value="all">Todos</option>
+                    <option value="vehiculo">Vehículos</option>
+                    <option value="trailer">Trailers</option>
+                    <option value="sin-asignar">Sin asignar</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table class="custom-table" id="mant-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Mantenimiento</th>
+                        <th>Asociado a</th>
+                        <th>Fecha</th>
+                        <th>Km Actual</th>
+                        <th>Próximo Cambio</th>
+                        <th>Costo</th>
+                        <th>Anexo</th>
+                    </tr>
+                </thead>
+                <tbody id="table-tbody">
+                    {% for mant in mantenimientos %}
+                    <tr data-search="{{ mant.nombre_mantenimiento|lower }} {% if mant.vehiculo %}{{ mant.vehiculo|lower }}{% endif %} {% if mant.trailer %}{{ mant.trailer|lower }}{% endif %}"
+                        data-asociado="{% if mant.vehiculo %}vehiculo{% elif mant.trailer %}trailer{% else %}sin-asignar{% endif %}">
+
+                        <td>
+                            <span class="mant-id">
+                                <i class="bi bi-tools"></i>
+                                M{{ mant.id|stringformat:"04d" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="mant-name">{{ mant.nombre_mantenimiento }}</span>
+                        </td>
+
+                        <td>
+                            {% if mant.vehiculo %}
+                                <span class="asociado-badge asociado-vehiculo">
+                                    <span class="dot"></span>
+                                    <i class="bi bi-truck"></i>
+                                    {{ mant.vehiculo }}
+                                </span>
+                            {% elif mant.trailer %}
+                                <span class="asociado-badge asociado-trailer">
+                                    <span class="dot"></span>
+                                    <i class="bi bi-box-seam"></i>
+                                    {{ mant.trailer }}
+                                </span>
+                            {% else %}
+                                <span class="asociado-badge asociado-none">
+                                    <span class="dot"></span>
+                                    Sin asignar
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td style="white-space:nowrap;">{{ mant.fecha|date:"d/m/Y" }}</td>
+
+                        <td>
+                            <span class="km-badge km-actual">
+                                <i class="bi bi-speedometer2"></i>
+                                {{ mant.km_actual|intcomma }} km
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="km-badge km-proximo">
+                                <i class="bi bi-flag"></i>
+                                {{ mant.proximo_km|intcomma }} km
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="costo-value">${{ mant.valor|floatformat:0|intcomma }}</span>
+                        </td>
+
+                        <td>
+                            {% if mant.foto %}
+                                <a href="{{ mant.foto.url }}" target="_blank" class="anexo-link" title="Ver comprobante">
+                                    <i class="bi bi-file-earmark-image"></i>
+                                </a>
+                            {% else %}
+                                <span class="anexo-empty">—</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr id="empty-row">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="bi bi-tools"></i></div>
+                                <p class="empty-title">Sin mantenimientos registrados</p>
+                                <p class="empty-desc">Los registros aparecerán aquí al crearlos</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Filtro vacío -->
+        <div id="filter-empty" class="empty-state">
+            <div class="empty-icon"><i class="bi bi-search"></i></div>
+            <p class="empty-title">Sin resultados</p>
+            <p class="empty-desc">Intenta con otro término de búsqueda o filtro</p>
+        </div>
+
+        {% if mantenimientos %}
+        <div class="table-footer">
+            <span id="table-count">Mostrando {{ mantenimientos.count }} registro(s)</span>
+            <div class="d-flex align-items-center gap-1">
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página anterior">
+                    <i class="bi bi-chevron-left" style="font-size:.7rem;"></i>
+                </button>
+                <button class="page-btn page-btn-active" aria-label="Página 1">1</button>
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página siguiente">
+                    <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+
+<script>
+    // =============================================
+    // Búsqueda y filtros en tiempo real
+    // =============================================
+    function filterTable() {
+        var query = document.getElementById('table-search').value.toLowerCase().trim();
+        var asociadoFilter = document.getElementById('asociado-filter').value;
+        var rows = document.querySelectorAll('#table-tbody tr[data-search]');
+        var filterEmpty = document.getElementById('filter-empty');
+        var visible = 0;
+
+        rows.forEach(function(row) {
+            var searchText = row.getAttribute('data-search') || '';
+            var asociado = row.getAttribute('data-asociado') || '';
+
+            var matchSearch = !query || searchText.includes(query);
+            var matchAsociado = asociadoFilter === 'all' || asociado === asociadoFilter;
+
+            if (matchSearch && matchAsociado) {
+                row.style.display = '';
+                visible++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        var emptyRow = document.getElementById('empty-row');
+        var hasDjangoData = !emptyRow;
+
+        if (hasDjangoData && filterEmpty) {
+            filterEmpty.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        var countEl = document.getElementById('table-count');
+        if (countEl) countEl.textContent = 'Mostrando ' + visible + ' registro(s)';
+    }
+
+    // =============================================
+    // Toasts
+    // =============================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var iconMap = {
+            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
+        };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter toast-' + type;
+        toast.innerHTML = (iconMap[type] || iconMap.info) +
+            '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    // Django messages → Toast
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                showToast('{{ message|escapejs }}', 'success');
+            {% elif message.tags == 'error' %}
+                showToast('{{ message|escapejs }}', 'error');
+            {% else %}
+                showToast('{{ message|escapejs }}', 'info');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

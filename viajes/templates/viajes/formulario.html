@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 0 auto; padding-bottom: 50px;">
+    <h4 class="text-center fw-bold my-4 text-dark">Registro de viaje admin</h4>
+
+    <form method="POST" class="d-flex flex-column gap-3">
+        {% csrf_token %}
+
+        {% if form %}
+            {% for field in form %}
+                <div class="mb-1">
+                    <label class="form-label fw-bold small text-dark ms-2 mb-1">{{ field.label }}</label>
+                    <div class="input-group align-items-center px-3 py-1 shadow-sm" 
+                         style="background-color: #e2e8f0; border-radius: 30px;">
+                        <span class="text-secondary me-2">✏️</span>
+                        {{ field }}
+                    </div>
+                    {% if field.errors %}
+                        <small class="text-danger ms-3">{{ field.errors|striptags }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <label class="form-label fw-bold small text-dark ms-2 mb-1">Conductor</label>
+                <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                    <span class="text-secondary me-2">👤</span>
+                    <select name="conductor" class="form-control bg-transparent border-0 p-0 text-dark" style="outline: none; box-shadow: none;">
+                        <option>Selecciona un conductor</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label fw-bold small text-dark ms-2 mb-1">Vehículo</label>
+                <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                    <span class="text-secondary me-2">🚛</span>
+                    <input type="text" name="vehiculo" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Sin vehículo seleccionado">
+                </div>
+            </div>
+
+            <div>
+                <label class="form-label fw-bold small text-dark ms-2 mb-1">Cliente</label>
+                <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                    <span class="text-secondary me-2">🏢</span>
+                    <input type="text" name="cliente" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Nombre del cliente">
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label fw-bold small text-dark ms-2 mb-1">Origen</label>
+                    <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                        <span class="text-secondary me-2">📍</span>
+                        <input type="text" name="origen" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Lugar de inicio">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label fw-bold small text-dark ms-2 mb-1">Destino</label>
+                    <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                        <span class="text-secondary me-2">🏁</span>
+                        <input type="text" name="destino" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Lugar de destino">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="form-label fw-bold small text-dark ms-2 mb-1">Flete</label>
+                    <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                        <span class="text-secondary me-2">💵</span>
+                        <input type="number" name="flete" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Ingresa el Flete del viaje">
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="form-label fw-bold small text-dark ms-2 mb-1">Anticipo</label>
+                    <div class="input-group align-items-center px-3 py-2 shadow-sm" style="background-color: #e2e8f0; border-radius: 30px;">
+                        <span class="text-secondary me-2">💼</span>
+                        <input type="number" name="anticipo" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Anticipo del Viaje">
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-dark w-100 rounded-pill py-3 fw-bold mt-4 shadow" style="background-color: #000000; border: none; font-size: 1.1rem;">
+            Guardar
+        </button>
+    </form>
+</div>
+
+<style>
+    .input-group input, .input-group select {
+        border: none !important;
+        background: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        color: #2d3748;
+    }
+</style>
+{% endblock %}

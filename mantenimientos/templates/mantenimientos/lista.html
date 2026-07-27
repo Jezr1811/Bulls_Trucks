@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %} Mantenimientos {% endblock %}
+
+{% block content %}
+<div class="container py-4 position-relative" style="min-height: 85vh;">
+
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-dark m-0">Mantenimiento admin y operador</h2>
+    </div>
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8 col-lg-6">
+            <label class="form-label text-muted small fw-bold ps-3 mb-1">Filtrar por vehículo</label>
+            <form method="GET" action="{% url 'mantenimientos:lista_mantenimientos' %}">
+                <div class="input-group bg-light rounded-pill border px-3 py-1 shadow-sm">
+                    <span class="input-group-text bg-transparent border-0 fs-5 text-muted">🚛</span>
+                    <select name="vehiculo" class="form-select bg-transparent border-0 fw-semibold text-secondary" style="box-shadow: none;" onchange="this.form.submit()">
+                        <option value="">Todos los vehículos</option>
+                        {% for v in vehiculos %}
+                            <option value="{{ v.id }}" {% if request.GET.vehiculo == v.id|stringformat:"s" %}selected{% endif %}>
+                                {{ v.placa }} - {{ v.marca|default:"" }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            {% for m in mantenimientos %}
+                <div class="card border-0 shadow-sm rounded-4 p-3 mb-3 {% cycle 'bg-success-subtle text-success-emphasis' 'bg-warning-subtle text-warning-emphasis' %}" 
+                     style="border-left: 8px solid {% cycle '#198754' '#ffc107' %} !important;">
+                    <div class="card-body p-2 position-relative">
+                        
+                        <div class="position-absolute top-0 end-0" style="z-index: 10;">
+                            <div class="dropdown">
+                                <button class="btn btn-link text-dark p-0 border-0 fs-4" type="button" data-bs-toggle="dropdown" style="text-decoration: none; box-shadow: none;">
+                                    ⋮
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-3">
+                                    <li><a class="dropdown-item px-3 py-2 small" href="{% url 'mantenimientos:editar_mantenimiento' m.pk %}">✏️ Editar</a></li>
+                                    {% if request.user.is_superuser %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item px-3 py-2 text-danger small" href="{% url 'mantenimientos:eliminar_mantenimiento' m.pk %}">🗑️ Eliminar</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'mantenimientos:detalle_mantenimiento' m.pk %}" class="text-decoration-none text-reset stretched-link">
+                            <h4 class="fw-bold mb-2 pe-4">{{ m.nombre_mantenimiento }}</h4>
+                            <p class="mb-1 small"><strong>Vehículo:</strong> {{ m.vehiculo.placa|default:"XXX 123" }}</p>
+                            <p class="mb-1 small"><strong>Fecha:</strong> {{ m.fecha|date:"d/m/Y" }}</p>
+                            <p class="mb-0 small text-truncate"><strong>Descripción:</strong> {{ m.descripcion|default:"Sin descripción breve" }}</p>
+                        </a>
+
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <p class="text-muted">No hay registros de mantenimiento para este criterio.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+    <div class="position-fixed bottom-0 end-0 mb-5 me-4" style="z-index: 1030;">
+        <a href="{% url 'mantenimientos:crear_mantenimiento' %}" class="btn btn-dark rounded-pill px-4 py-2.5 fw-bold shadow-lg d-flex align-items-center gap-2" style="background-color: #2b3035; border: none;">
+            <span>Agregar</span> <span class="fs-5">+</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}  

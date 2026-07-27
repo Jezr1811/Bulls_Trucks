@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 600px; margin: 0 auto; padding-bottom: 80px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+        <h5 class="fw-bold m-0 text-dark">
+            {% if request.user.is_superuser %}Viajes admin{% else %}Mis Viajes{% endif %}
+        </h5>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="position-relative">
+                <i class="bi bi-bell fs-5 text-dark"></i>
+            </span>
+            <a href="{% url 'viajes:lista_viajes' %}" class="text-dark"><i class="bi bi-arrow-clockwise fs-5"></i></a>
+        </div>
+    </div>
+
+    <div class="mb-4 px-2">
+        <div class="input-group rounded-pill shadow-sm bg-light border border-primary border-2 px-3 py-1">
+            <span class="input-group-text bg-transparent border-0 text-secondary p-0 me-2">
+                <i class="bi bi-search fs-5"></i>
+            </span>
+            <input type="text" class="form-control bg-transparent border-0 p-0 text-dark" placeholder="Buscar viaje, conductor o ruta..." style="box-shadow: none;">
+        </div>
+    </div>
+
+    <div class="d-flex flex-column gap-4">
+        {% for viaje in viajes %}
+            <div>
+                <div class="text-center fw-bold text-dark small mb-1 text-uppercase tracking-wider">
+                    Viaje # {{ viaje.id }}
+                </div>
+                
+                <div class="card border-0 rounded-4 shadow-sm p-3 position-relative" style="background-color: #f3f4f6; transition: transform 0.2s;">
+                    
+                    <a href="{% url 'viajes:detalle_viaje' viaje.id %}" class="stretched-link"></a>
+
+                    <div class="position-absolute" style="top: 15px; right: 15px; z-index: 5;">
+                        <div class="dropdown">
+                            <button class="btn btn-link text-dark p-0 border-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="box-shadow: none;">
+                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                                <li>
+                                    <a class="dropdown-menu-item d-block px-3 py-2 text-decoration-none text-dark small" href="{% url 'viajes:editar_viaje' viaje.id %}">
+                                        <i class="bi bi-pencil me-2 text-secondary"></i> Editar viaje
+                                    </a>
+                                </li>
+                                {% if request.user.is_superuser %}
+                                <hr class="my-1 border-light">
+                                <li>
+                                    <a class="dropdown-menu-item d-block px-3 py-2 text-decoration-none text-danger small" href="{% url 'viajes:eliminar_viaje' viaje.id %}">
+                                        <i class="bi bi-trash me-2"></i> Eliminar registro
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 pe-4">
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 1.05rem;">
+                            {{ viaje.conductor.user.email|default:viaje.conductor }}
+                        </div>
+                        <div class="text-secondary small fw-semibold mb-1">
+                            <i class="bi bi-truck me-1"></i> Vehículo: {{ viaje.vehiculo|default:"Sin asignar" }}
+                        </div>
+                        <div class="text-dark fw-bold small">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i> {{ viaje.origen }} - {{ viaje.destino }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-1 mb-3">
+                        <div class="w-100 py-1 px-3 rounded-2 fw-semibold small d-flex justify-content-between align-items-center" style="background-color: #c2f0c2; color: #14532d;">
+                            <span>Ingreso:</span>
+                            <span class="fw-bold">${{ viaje.flete }}</span>
+                        </div>
+                        <div class="w-100 py-1 px-3 rounded-2 fw-semibold small d-flex justify-content-between align-items-center" style="background-color: #ffcbc1; color: #7f1d1d;">
+                            <span>Gastos:</span>
+                            <span class="fw-bold">${{ viaje.total_gastos|default:"0" }}</span>
+                        </div>
+                        <div class="w-100 py-1 px-3 rounded-2 fw-bold small d-flex justify-content-between align-items-center" style="background-color: #4eff6e; color: #064e3b;">
+                            <span>Resultado:</span>
+                            <span>${{ viaje.resultado }}</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between text-muted" style="font-size: 0.78rem;">
+                        <div><span class="fw-semibold">Fecha inicio:</span> {{ viaje.fecha_inicio|date:"d/m/Y"|default:"--" }}</div>
+                        <div><span class="fw-semibold">Fecha fin:</span> {{ viaje.fecha_fin|date:"d/m/Y"|default:"En curso" }}</div>
+                    </div>
+
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-journal-x fs-1 d-block mb-2"></i>
+                No tienes viajes registrados en el historial.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if request.user.is_superuser %}
+<div class="position-fixed" style="bottom: 20px; right: 20px; z-index: 1030;">
+    <a href="{% url 'viajes:crear_viaje' %}" class="btn btn-dark rounded-circle p-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 55px; height: 55px;">
+        <i class="bi bi-plus-lg fs-4"></i>
+    </a>
+</div>
+{% endif %}
+
+<style>
+    .card:active {
+        transform: scale(0.98);
+        background-color: #e5e7eb !important;
+    }
+</style>
+{% endblock %}

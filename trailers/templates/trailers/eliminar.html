@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Eliminar Trailer</h2>
+
+<p>
+
+    ¿Está seguro de eliminar el trailer
+
+    <strong>{{ trailer.placa }}</strong>?
+
+</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        Sí, eliminar
+    </button>
+
+    <a href="{% url 'trailers:lista_trailers' %}">
+        Cancelar
+    </a>
+
+</form>
+
+{% endblock %}

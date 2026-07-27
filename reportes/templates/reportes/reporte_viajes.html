@@ -1,0 +1,718 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+
+    :root {
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --accent-light: #e0f2fe;
+        --border: #eef2f7;
+        --success: #16a34a;
+        --danger: #ef4444;
+        --warning: #d97706;
+        --muted: #9ca3af;
+        --fg: #1f2937;
+    }
+
+    /* ============ PAGE ============ */
+    .report-page {
+        max-width: 88rem;
+        margin: 0 auto;
+        padding: 1.75rem 1rem 4rem;
+    }
+    @media (min-width: 768px) {
+        .report-page { padding: 2rem 2.5rem 4rem; }
+    }
+
+    /* ============ HEADER ============ */
+    .page-header {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        margin-bottom: 1.75rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .accent-bar {
+        width: 6px;
+        height: 2.25rem;
+        border-radius: 99px;
+        background: linear-gradient(to bottom, #4da0ff, #2F80ED);
+        flex-shrink: 0;
+    }
+    .page-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin: 0;
+        letter-spacing: -.03em;
+        line-height: 1.15;
+    }
+    .page-header p {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: .15rem 0 0;
+    }
+
+    /* ============ METRIC CARDS ============ */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.75rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .05s forwards;
+        opacity: 0;
+    }
+    @media (max-width: 991.98px) {
+        .metrics-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 575.98px) {
+        .metrics-grid { grid-template-columns: 1fr; }
+    }
+
+    .metric-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .metric-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.07);
+    }
+
+    /* Barra superior de color */
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+    .metric-card.card-viajes::before { background: linear-gradient(90deg, #2F80ED, #60a5fa); }
+    .metric-card.card-ganancias::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .metric-card.card-duracion::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+    .metric-card.card-promedio::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        margin-bottom: .85rem;
+    }
+    .card-viajes .metric-icon { background: #eff6ff; color: #2F80ED; }
+    .card-ganancias .metric-icon { background: #ecfdf5; color: #16a34a; }
+    .card-duracion .metric-icon { background: #fffbeb; color: #d97706; }
+    .card-promedio .metric-icon { background: #f5f3ff; color: #7c3aed; }
+
+    .metric-label {
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--muted);
+        margin-bottom: .3rem;
+        display: block;
+    }
+    .metric-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.65rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin-bottom: .4rem;
+        letter-spacing: -.02em;
+        animation: countUp .5s ease forwards;
+    }
+    .metric-subtext {
+        font-size: .75rem;
+        color: #c9cdd4;
+        display: block;
+    }
+
+    /* ============ TABLE CARD ============ */
+    .table-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        overflow: hidden;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .1s forwards;
+        opacity: 0;
+    }
+
+    .table-card-header {
+        padding: 1.15rem 1.35rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .header-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #1e3a5f, #2c5282);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    .table-card-header h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--fg);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        flex-wrap: wrap;
+    }
+
+    /* Search */
+    .table-search {
+        position: relative;
+    }
+    .table-search .bi-search {
+        position: absolute;
+        left: .7rem; top: 50%; transform: translateY(-50%);
+        color: #d1d5db; font-size: .8rem; pointer-events: none;
+    }
+    .table-search input {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem .4rem 2rem;
+        font-size: .82rem;
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+        width: 210px;
+    }
+    .table-search input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    /* Filter select */
+    .filter-select {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem;
+        font-size: .82rem;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    /* ============ TABLA ============ */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .85rem;
+    }
+
+    .custom-table thead {
+        background: rgba(248,250,252,.8);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .custom-table th {
+        font-size: .68rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: .8rem 1.15rem;
+        border: none;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .custom-table td {
+        padding: .8rem 1.15rem;
+        vertical-align: middle;
+        border-top: 1px solid #f3f6fa;
+        color: #4b5563;
+    }
+
+    .custom-table tbody tr {
+        transition: background .15s, box-shadow .15s;
+    }
+    .custom-table tbody tr:hover {
+        background: #f8fbff;
+        box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    /* ID del viaje */
+    .viaje-id {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        color: #4b5563;
+        font-size: .75rem;
+        font-weight: 700;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .viaje-id i { font-size: .65rem; color: #9ca3af; }
+
+    /* Ruta */
+    .route-cell {
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+        font-weight: 600;
+        color: var(--fg);
+    }
+    .route-cell .bi-geo-alt-fill { color: #ef4444; font-size: .8rem; flex-shrink: 0; }
+    .route-arrow { color: #9ca3af; font-size: .7rem; }
+
+    /* Duración badge */
+    .duration-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        color: #92400e;
+        font-size: .78rem;
+        font-weight: 600;
+        padding: .2rem .55rem;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    .duration-badge i { font-size: .65rem; }
+
+    /* Flete / Ganancia */
+    .flete-value {
+        font-weight: 700;
+        color: #047857;
+        font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Estado badges */
+    .estado-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .25rem .7rem;
+        border-radius: 99px;
+        border: 1px solid;
+        white-space: nowrap;
+        text-transform: capitalize;
+    }
+    .estado-badge .dot {
+        width: 5px; height: 5px; border-radius: 50%;
+    }
+
+    .estado-en-curso {
+        background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;
+    }
+    .estado-en-curso .dot { background: #3b82f6; }
+
+    .estado-completado {
+        background: #ecfdf5; color: #047857; border-color: #a7f3d0;
+    }
+    .estado-completado .dot { background: #16a34a; }
+
+    .estado-programado {
+        background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe;
+    }
+    .estado-programado .dot { background: #7c3aed; }
+
+    .estado-cancelado {
+        background: #fef2f2; color: #b91c1c; border-color: #fecaca;
+    }
+    .estado-cancelado .dot { background: #ef4444; }
+
+    /* Footer */
+    .table-footer {
+        padding: .7rem 1.15rem;
+        border-top: 1px solid var(--border);
+        background: rgba(248,249,250,.4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .75rem;
+        color: var(--muted);
+    }
+    .table-footer .page-btn {
+        width: 30px; height: 30px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        border: none; font-size: .75rem; font-weight: 600;
+    }
+    .page-btn-active { background: var(--accent); color: #fff; }
+    .page-btn-disabled { background: transparent; color: #d1d5db; }
+
+    /* Empty state */
+    .empty-state {
+        padding: 3.5rem 1rem;
+        text-align: center;
+    }
+    .empty-icon {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: #f3f4f6;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .empty-icon i { font-size: 1.5rem; color: #d1d5db; }
+    .empty-title { color: #6b7280; font-weight: 600; font-size: .95rem; margin: 0 0 .3rem; }
+    .empty-desc { color: #d1d5db; font-size: .82rem; margin: 0; }
+
+    #filter-empty { display: none; }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed; top: 90px; right: 1rem; z-index: 9999;
+        display: flex; flex-direction: column; gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex; align-items: center; gap: .65rem;
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
+        border-left: 4px solid; font-size: .85rem; color: #374151;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-dismiss {
+        background: none; border: none; color: #d1d5db;
+        cursor: pointer; font-size: .85rem; padding: 2px;
+        transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 991.98px) {
+        .custom-table th:nth-child(4),
+        .custom-table td:nth-child(4) { display: none; }
+    }
+    @media (max-width: 767.98px) {
+        .custom-table th:nth-child(5),
+        .custom-table td:nth-child(5) { display: none; }
+        .table-search input { width: 160px; }
+    }
+    @media (max-width: 575.98px) {
+        .page-header h1 { font-size: 1.5rem; }
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3) { display: none; }
+        .header-right { width: 100%; }
+        .table-search input { width: 100%; }
+        .table-search { flex: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<div class="report-page">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div class="accent-bar"></div>
+        <div>
+            <h1>Reporte de Viajes</h1>
+            <p>Resumen general del historial de viajes</p>
+        </div>
+    </div>
+
+    <!-- Metric Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card card-viajes">
+            <div class="metric-icon"><i class="bi bi-sign-turn-right"></i></div>
+            <span class="metric-label">Total de Viajes</span>
+            <div class="metric-value">{{ total_viajes|default:0 }}</div>
+            <span class="metric-subtext">Historial de viajes registrados</span>
+        </div>
+        <div class="metric-card card-ganancias">
+            <div class="metric-icon"><i class="bi bi-cash-stack"></i></div>
+            <span class="metric-label">Ganancias Totales</span>
+            <div class="metric-value">${{ ganancias_semanales|floatformat:0|intcomma }}</div>
+            <span class="metric-subtext">Suma total de fletes cobrados</span>
+        </div>
+        <div class="metric-card card-duracion">
+            <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
+            <span class="metric-label">Duración Total</span>
+            <div class="metric-value">{{ duracion_total|default:0 }} días</div>
+            <span class="metric-subtext">Tiempo acumulado en ruta</span>
+        </div>
+        <div class="metric-card card-promedio">
+            <div class="metric-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <span class="metric-label">Ganancia Promedio</span>
+            <div class="metric-value">${{ ganancia_promedio|floatformat:0|intcomma }}</div>
+            <span class="metric-subtext">Promedio por flete de viaje</span>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div class="header-left">
+                <div class="header-icon"><i class="bi bi-table"></i></div>
+                <h3>Detalle de Viajes</h3>
+            </div>
+            <div class="header-right">
+                <div class="table-search">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="table-search" placeholder="Buscar viaje, ruta..." oninput="filterTable()" aria-label="Buscar viaje">
+                </div>
+                <select id="status-filter" class="filter-select" onchange="filterTable()" aria-label="Filtrar por estado">
+                    <option value="all">Todos los estados</option>
+                    <option value="en curso">En Curso</option>
+                    <option value="completado">Completado</option>
+                    <option value="programado">Programado</option>
+                    <option value="cancelado">Cancelado</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table class="custom-table" id="viajes-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ruta</th>
+                        <th>Fecha Registro</th>
+                        <th>Duración</th>
+                        <th>Flete</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="table-tbody">
+                    {% for viaje in viajes %}
+                    <tr data-search="{{ viaje.origen|lower }} {{ viaje.destino|lower }} {{ viaje.fecha_creacion|date:'d/m/Y' }}"
+                        data-estado="{{ viaje.get_estado_display|lower }}">
+
+                        <td>
+                            <span class="viaje-id">
+                                <i class="bi bi-sign-turn-right"></i>
+                                V{{ viaje.id|stringformat:"04d" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="route-cell">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                {{ viaje.origen }}
+                                <span class="route-arrow">→</span>
+                                {{ viaje.destino }}
+                            </div>
+                        </td>
+
+                        <td style="white-space:nowrap;">{{ viaje.fecha_creacion|date:"d/m/Y" }}</td>
+
+                        <td>
+                            {% if viaje.fecha_inicio and viaje.fecha_fin %}
+                                <span class="duration-badge">
+                                    <i class="bi bi-clock"></i>
+                                    {{ viaje.duracion_en_dias }} días
+                                </span>
+                            {% else %}
+                                <span style="color:#d1d5db;">—</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="flete-value">${{ viaje.flete|floatformat:0|intcomma }}</span>
+                        </td>
+
+                        <td>
+                            {% if viaje.get_estado_display|lower == "en curso" %}
+                                <span class="estado-badge estado-en-curso"><span class="dot"></span>{{ viaje.get_estado_display }}</span>
+                            {% elif viaje.get_estado_display|lower == "completado" %}
+                                <span class="estado-badge estado-completado"><span class="dot"></span>{{ viaje.get_estado_display }}</span>
+                            {% elif viaje.get_estado_display|lower == "programado" %}
+                                <span class="estado-badge estado-programado"><span class="dot"></span>{{ viaje.get_estado_display }}</span>
+                            {% elif viaje.get_estado_display|lower == "cancelado" %}
+                                <span class="estado-badge estado-cancelado"><span class="dot"></span>{{ viaje.get_estado_display }}</span>
+                            {% else %}
+                                <span class="estado-badge estado-en-curso"><span class="dot"></span>{{ viaje.get_estado_display }}</span>
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                    {% empty %}
+                    <tr id="empty-row">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="bi bi-sign-turn-right"></i></div>
+                                <p class="empty-title">Sin viajes registrados</p>
+                                <p class="empty-desc">Los viajes aparecerán aquí al registrarlos</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Filtro vacío -->
+        <div id="filter-empty" class="empty-state">
+            <div class="empty-icon"><i class="bi bi-search"></i></div>
+            <p class="empty-title">Sin resultados</p>
+            <p class="empty-desc">Intenta con otro término de búsqueda o estado</p>
+        </div>
+
+        {% if viajes %}
+        <div class="table-footer">
+            <span id="table-count">Mostrando {{ viajes.count }} viaje(s)</span>
+            <div class="d-flex align-items-center gap-1">
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página anterior">
+                    <i class="bi bi-chevron-left" style="font-size:.7rem;"></i>
+                </button>
+                <button class="page-btn page-btn-active" aria-label="Página 1">1</button>
+                <button class="page-btn page-btn-disabled" disabled aria-label="Página siguiente">
+                    <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+
+<script>
+    // =============================================
+    // Búsqueda y filtros en tiempo real
+    // =============================================
+    function filterTable() {
+        const query = document.getElementById('table-search').value.toLowerCase().trim();
+        const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+        const rows = document.querySelectorAll('#table-tbody tr[data-search]');
+        const filterEmpty = document.getElementById('filter-empty');
+        let visible = 0;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search') || '';
+            const estado = row.getAttribute('data-estado') || '';
+
+            const matchSearch = !query || searchText.includes(query);
+            const matchStatus = statusFilter === 'all' || estado.includes(statusFilter);
+
+            if (matchSearch && matchStatus) {
+                row.style.display = '';
+                visible++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const emptyRow = document.getElementById('empty-row');
+        const hasDjangoData = !emptyRow;
+
+        if (hasDjangoData && filterEmpty) {
+            filterEmpty.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        const countEl = document.getElementById('table-count');
+        if (countEl) countEl.textContent = 'Mostrando ' + visible + ' viaje(s)';
+    }
+
+    // =============================================
+    // Toasts
+    // =============================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var iconMap = {
+            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
+        };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter toast-' + type;
+        toast.innerHTML = (iconMap[type] || iconMap.info) +
+            '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    // Django messages → Toast
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                showToast('{{ message|escapejs }}', 'success');
+            {% elif message.tags == 'error' %}
+                showToast('{{ message|escapejs }}', 'error');
+            {% else %}
+                showToast('{{ message|escapejs }}', 'info');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}
+Renovar Documento
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <!-- Encabezado -->
+
+    <div class="d-flex align-items-center mb-4">
+
+        <a href="{% url 'documentos:lista_documentos' %}"
+           class="btn btn-outline-secondary rounded-pill me-3 px-4">
+
+            <i class="bi bi-arrow-left"></i>
+            Volver
+
+        </a>
+
+        <div>
+
+            <h2 class="fw-bold mb-0">
+
+                Renovar Documento
+
+            </h2>
+
+            <small class="text-muted">
+
+                Actualiza la vigencia y los archivos del documento.
+
+            </small>
+
+        </div>
+
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <!-- Información -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Información actual
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p><strong>Tipo:</strong> {{ documento.get_tipo_display }}</p>
+
+                        <p><strong>Vehículo:</strong> {{ documento.vehiculo }}</p>
+
+                        <p><strong>Conductor:</strong> {{ documento.conductor }}</p>
+
+                        <p><strong>Número:</strong> {{ documento.numero }}</p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <p><strong>Fecha expedición:</strong> {{ documento.fecha_expedicion }}</p>
+
+                        <p><strong>Fecha vencimiento:</strong> {{ documento.fecha_vencimiento }}</p>
+
+                        <p>
+
+                            <strong>Estado:</strong>
+
+                            {% if documento.estado == "vigente" %}
+
+                                <span class="badge bg-success">
+
+                                    Vigente
+
+                                </span>
+
+                            {% elif documento.estado == "proximo" %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Próximo a vencer
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    Vencido
+
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Archivos -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Archivos actuales
+
+                </h4>
+
+                <div class="row">
+
+                    <!-- Imagen -->
+
+                    <div class="col-md-6 mb-3">
+
+                        {% if documento.imagen %}
+
+                            <img src="{{ documento.imagen.url }}"
+                                 class="img-fluid rounded-4 shadow w-100"
+                                 style="height:250px;object-fit:cover;">
+
+                        {% else %}
+
+                            <div class="border rounded-4 bg-light text-center d-flex flex-column justify-content-center align-items-center"
+                                 style="height:250px;">
+
+                                <i class="bi bi-image text-secondary"
+                                   style="font-size:70px;"></i>
+
+                                <p class="text-muted mt-3 mb-0">
+
+                                    No hay imagen registrada
+
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- PDF -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <div class="border rounded-4 bg-light d-flex justify-content-center align-items-center"
+                             style="height:250px;">
+
+                            {% if documento.pdf %}
+
+                                <a href="{{ documento.pdf.url }}"
+                                   target="_blank"
+                                   class="btn btn-dark rounded-pill px-5 py-3">
+
+                                    📄 Ver PDF actual
+
+                                </a>
+
+                            {% else %}
+
+                                <button class="btn btn-secondary rounded-pill px-5 py-3"
+                                        disabled>
+
+                                    Sin PDF registrado
+
+                                </button>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Renovación -->
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Renovación
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nueva fecha de vencimiento
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_vencimiento"
+                            class="form-control rounded-pill"
+                            value="{{ documento.fecha_vencimiento|date:'Y-m-d' }}"
+                            required>
+
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nueva imagen (Opcional)
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="imagen"
+                            id="id_imagen"
+                            class="form-control"
+                            accept="image/*">
+
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nuevo PDF (Opcional)
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="pdf"
+                            class="form-control"
+                            accept=".pdf">
+
+                    </div>
+
+                </div>
+
+                <!-- Vista previa -->
+
+                <div class="mb-4">
+
+                    <img id="preview"
+                         class="img-fluid rounded-4 shadow d-none"
+                         style="max-height:250px;">
+
+                </div>
+
+                <hr>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <a href="{% url 'documentos:lista_documentos' %}"
+                           class="btn btn-outline-secondary rounded-pill w-100 py-3">
+
+                            Cancelar
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success rounded-pill w-100 py-3 fw-bold">
+
+                            ♻ Renovar Documento
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+const imagen=document.getElementById("id_imagen");
+
+if(imagen){
+
+    imagen.addEventListener("change",function(){
+
+        if(this.files.length){
+
+            const reader=new FileReader();
+
+            reader.onload=function(e){
+
+                const preview=document.getElementById("preview");
+
+                preview.src=e.target.result;
+
+                preview.classList.remove("d-none");
+
+            }
+
+            reader.readAsDataURL(this.files[0]);
+
+        }
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

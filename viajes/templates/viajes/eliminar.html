@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="card border-0 shadow rounded-4 p-4 text-center" style="max-width: 450px; background-color: #f8f9fa;">
+        <div class="fs-1 text-danger mb-2">⚠️</div>
+        <h4 class="fw-bold text-dark mb-3">¿Eliminar Viaje?</h4>
+        <p class="text-secondary small mb-4">
+            Estás a punto de borrar el registro del **Viaje #{{ viaje.id }}** ({{ viaje.origen }} → {{ viaje.destino }}). Esta acción no se puede deshacer.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="d-flex gap-3">
+                <a href="{% url 'viajes:lista_viajes' %}" class="btn btn-light w-100 rounded-pill py-2 fw-semibold border">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold shadow-sm">
+                    Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

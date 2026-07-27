@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}
+Eliminar Documento
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            
+            <div class="card border-0 shadow-sm rounded-4 text-center p-4">
+                <div class="card-body">
+                    
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle rounded-circle" style="width: 80px; height: 80px; font-size: 40px;">
+                            🗑️
+                        </div>
+                    </div>
+
+                    <h3 class="fw-bold text-dark mb-2">
+                        ¿Eliminar documento?
+                    </h3>
+                    
+                    <p class="text-muted mb-4">
+                        Esta acción es definitiva y no se podrá deshacer.
+                    </p>
+
+                    <div class="bg-light p-3 rounded-3 text-start border mb-4">
+                        <small class="text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 11px; letter-spacing: 0.5px;">
+                            Documento seleccionado
+                        </small>
+                        <strong class="text-dark fs-5">
+                            {{ documento }}
+                        </strong>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger fw-bold py-2.5 rounded-3 shadow-sm">
+                                Sí, eliminar definitivamente
+                            </button>
+                            
+                            <a href="{% url 'documentos:lista_documentos' %}" class="btn btn-light text-muted py-2.5 rounded-3 border-0">
+                                Cancelar y regresar
+                            </a>
+                        </div>
+                        
+                    </form>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

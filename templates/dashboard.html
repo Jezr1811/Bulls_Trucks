@@ -1,0 +1,660 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 4px 20px rgba(47,128,237,.2); }
+        50% { box-shadow: 0 4px 28px rgba(47,128,237,.35); }
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
+
+    :root {
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --accent-light: #e0f2fe;
+        --border: #eef2f7;
+        --success: #16a34a;
+        --danger: #ef4444;
+        --warning: #d97706;
+        --muted: #9ca3af;
+        --fg: #1f2937;
+    }
+
+    /* ============ PAGE ============ */
+    .dashboard-page {
+        max-width: 88rem;
+        margin: 0 auto;
+        padding: 1.75rem 1rem 4rem;
+    }
+    @media (min-width: 768px) {
+        .dashboard-page { padding: 2rem 2.5rem 4rem; }
+    }
+
+    /* ============ WELCOME ============ */
+    .welcome-section {
+        margin-bottom: 1.75rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .welcome-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .welcome-left {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+    .welcome-avatar {
+        width: 48px; height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #1e3a5f, #2c5282);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+    .welcome-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin: 0;
+        letter-spacing: -.02em;
+    }
+    .welcome-sub {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: .1rem 0 0;
+    }
+    .welcome-date {
+        font-size: .82rem;
+        color: var(--muted);
+        text-align: right;
+        white-space: nowrap;
+    }
+    .welcome-date strong {
+        display: block;
+        font-size: .92rem;
+        color: var(--fg);
+        font-weight: 700;
+    }
+
+    /* ============ MAP CARD ============ */
+    .map-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .04s forwards;
+        opacity: 0;
+    }
+    .map-placeholder {
+        height: 260px;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe, #f0f9ff);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .75rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .map-placeholder::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 40%, rgba(47,128,237,.06) 0%, transparent 50%),
+            radial-gradient(circle at 80% 60%, rgba(47,128,237,.04) 0%, transparent 50%);
+    }
+    .map-placeholder-icon {
+        width: 64px; height: 64px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid #bae6fd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #2F80ED;
+        animation: float 3s ease-in-out infinite;
+        position: relative;
+        z-index: 1;
+    }
+    .map-placeholder-text {
+        font-size: .85rem;
+        font-weight: 600;
+        color: #64748b;
+        position: relative;
+        z-index: 1;
+    }
+    .map-placeholder-sub {
+        font-size: .75rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
+    }
+    @media (min-width: 768px) {
+        .map-placeholder { height: 320px; }
+    }
+
+    /* ============ BALANCE + NAV GRID ============ */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .08s forwards;
+        opacity: 0;
+    }
+    @media (max-width: 991.98px) {
+        .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============ BALANCE CARD ============ */
+    .balance-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        overflow: hidden;
+    }
+    .balance-header {
+        padding: 1.15rem 1.35rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+    .balance-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #047857, #059669);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+    .balance-header h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--fg);
+        margin: 0;
+    }
+    .balance-body { padding: 1.35rem; }
+
+    .balance-total {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        color: #047857;
+        margin-bottom: .35rem;
+        letter-spacing: -.03em;
+        animation: countUp .5s ease forwards;
+    }
+    .balance-total-label {
+        font-size: .78rem;
+        color: var(--muted);
+        margin-bottom: 1.15rem;
+        display: block;
+    }
+
+    .balance-rows { display: flex; flex-direction: column; gap: .65rem; }
+    .balance-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .55rem .85rem;
+        border-radius: 10px;
+    }
+    .balance-row-ingreso { background: #ecfdf5; }
+    .balance-row-gasto { background: #fef2f2; }
+    .balance-row-label {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        font-size: .82rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    .balance-row-label i { font-size: .75rem; }
+    .balance-row-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: .92rem;
+    }
+    .balance-row-ingreso .balance-row-label i { color: #16a34a; }
+    .balance-row-ingreso .balance-row-value { color: #047857; }
+    .balance-row-gasto .balance-row-label i { color: #ef4444; }
+    .balance-row-gasto .balance-row-value { color: #b91c1c; }
+
+    /* ============ NAV CARDS GRID ============ */
+    .nav-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .nav-card {
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        padding: 1.15rem;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 130px;
+        transition: transform .2s, box-shadow .2s;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .nav-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.1);
+    }
+    .nav-card:active {
+        transform: translateY(-1px);
+    }
+
+    /* Barra superior de color */
+    .nav-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+    }
+
+    .nav-card-icon {
+        width: 40px; height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.05rem;
+        margin-bottom: .65rem;
+    }
+    .nav-card-title {
+        font-size: .82rem;
+        font-weight: 600;
+        margin-bottom: .15rem;
+    }
+    .nav-card-value {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -.02em;
+    }
+
+    /* Card: Documentos */
+    .nav-card-docs { background: #fef2f2; }
+    .nav-card-docs::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .nav-card-docs .nav-card-icon { background: #fee2e2; color: #ef4444; }
+    .nav-card-docs .nav-card-title { color: #991b1b; }
+    .nav-card-docs .nav-card-value { color: #7f1d1d; }
+
+    /* Card: Viajes */
+    .nav-card-viajes { background: #eff6ff; }
+    .nav-card-viajes::before { background: linear-gradient(90deg, #2F80ED, #60a5fa); }
+    .nav-card-viajes .nav-card-icon { background: #dbeafe; color: #2F80ED; }
+    .nav-card-viajes .nav-card-title { color: #1d4ed8; }
+    .nav-card-viajes .nav-card-value { color: #1e3a5f; }
+
+    /* Card: Mantenimientos */
+    .nav-card-mant { background: #ecfdf5; }
+    .nav-card-mant::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
+    .nav-card-mant .nav-card-icon { background: #dcfce7; color: #16a34a; }
+    .nav-card-mant .nav-card-title { color: #15803d; }
+    .nav-card-mant .nav-card-value { color: #14532d; }
+
+    /* Card: Reportes / Gastos */
+    .nav-card-reportes {
+        background: #f5f3ff;
+        overflow: visible !important; /* Permite que el desplegable no se recorte */
+    }
+    .nav-card-reportes::before {
+        background: linear-gradient(90deg, #7c3aed, #a78bfa);
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .nav-card-reportes .nav-card-icon { background: #ede9fe; color: #7c3aed; }
+    .nav-card-reportes .nav-card-title { color: #6d28d9; }
+    .nav-card-reportes .nav-card-value { color: #4c1d95; }
+
+    .nav-card-gastos { background: #fff7ed; }
+    .nav-card-gastos::before { background: linear-gradient(90deg, #ea580c, #fb923c); }
+    .nav-card-gastos .nav-card-icon { background: #fed7aa; color: #ea580c; }
+    .nav-card-gastos .nav-card-title { color: #9a3412; }
+    .nav-card-gastos .nav-card-value { color: #7c2d12; }
+
+    /* Dropdown inside card */
+    .nav-card-dropdown {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        padding: 0;
+        font-family: inherit;
+    }
+    .nav-card-dropdown:focus { outline: none; }
+
+    .dropdown-menu-reportes {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.12);
+        padding: .4rem;
+        min-width: 220px;
+        z-index: 1050 !important; /* Se asegura de quedar encima del contenedor */
+    }
+    .dropdown-menu-reportes .dropdown-item {
+        border-radius: 10px;
+        font-size: .82rem;
+        font-weight: 500;
+        padding: .55rem .85rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        transition: background .12s;
+        color: var(--fg);
+    }
+    .dropdown-menu-reportes .dropdown-item:hover {
+        background: #f5f3ff;
+    }
+    .dropdown-menu-reportes .dropdown-item i {
+        font-size: .9rem;
+        width: 18px;
+        text-align: center;
+        color: #7c3aed;
+    }
+    .dropdown-menu-reportes .dropdown-divider {
+        margin: .25rem .5rem;
+        border-color: #f3f4f6;
+    }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed; top: 90px; right: 1rem; z-index: 9999;
+        display: flex; flex-direction: column; gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex; align-items: center; gap: .65rem;
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
+        border-left: 4px solid; font-size: .85rem; color: #374151;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-dismiss {
+        background: none; border: none; color: #d1d5db;
+        cursor: pointer; font-size: .85rem; padding: 2px;
+        transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 575.98px) {
+        .welcome-title { font-size: 1.25rem; }
+        .welcome-date { display: none; }
+        .nav-grid { grid-template-columns: 1fr; }
+        .balance-total { font-size: 1.6rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<div class="dashboard-page">
+
+    <!-- Welcome -->
+    <div class="welcome-section">
+        <div class="welcome-row">
+            <div class="welcome-left">
+                <div class="welcome-avatar">
+                    <i class="bi bi-truck-flatbed"></i>
+                </div>
+                <div>
+                    <h1 class="welcome-title">
+                        {% if request.user.is_superuser %}Panel Admin{% else %}Mi Panel{% endif %}
+                    </h1>
+                    <p class="welcome-sub">Bulls Trucks — Resumen general</p>
+                </div>
+            </div>
+            <div class="welcome-date">
+                <strong id="current-date"></strong>
+                <span id="current-time"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Placeholder -->
+    <div class="map-card">
+        <div class="map-placeholder">
+            <div class="map-placeholder-icon">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <span class="map-placeholder-text">Mapa de Seguimiento</span>
+            <span class="map-placeholder-sub">Próximamente — Rastreo de vehículos en tiempo real</span>
+        </div>
+    </div>
+
+    <!-- Main Grid: Balance + Nav Cards -->
+    <div class="main-grid">
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-header">
+                <div class="balance-icon"><i class="bi bi-wallet2"></i></div>
+                <h3>Balance del Mes</h3>
+            </div>
+            <div class="balance-body">
+                <div class="balance-total">${{ balance_mes|floatformat:0|intcomma }}</div>
+                <span class="balance-total-label">Resultado neto del periodo</span>
+                <div class="balance-rows">
+                    <div class="balance-row balance-row-ingreso">
+                        <span class="balance-row-label">
+                            <i class="bi bi-arrow-down-circle"></i>
+                            Ingresos
+                        </span>
+                        <span class="balance-row-value">${{ ingresos_mes|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="balance-row balance-row-gasto">
+                        <span class="balance-row-label">
+                            <i class="bi bi-arrow-up-circle"></i>
+                            Gastos
+                        </span>
+                        <span class="balance-row-value">${{ gastos_mes|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nav Cards -->
+        <div class="nav-grid">
+
+            <!-- Documentos -->
+            <a href="{% url 'documentos:lista_documentos' %}" class="nav-card nav-card-docs">
+                <div>
+                    <div class="nav-card-icon"><i class="bi bi-file-earmark-text"></i></div>
+                    <div class="nav-card-title">Documentos</div>
+                </div>
+                <div class="nav-card-value">{{ total_documentos }}</div>
+            </a>
+
+            <!-- Viajes -->
+            <a href="{% url 'viajes:lista_viajes' %}" class="nav-card nav-card-viajes">
+                <div>
+                    <div class="nav-card-icon"><i class="bi bi-sign-turn-right"></i></div>
+                    <div class="nav-card-title">Viajes</div>
+                </div>
+                <div class="nav-card-value">{{ total_viajes }}</div>
+            </a>
+
+            <!-- Mantenimientos -->
+            <a href="{% url 'mantenimientos:lista_mantenimientos' %}" class="nav-card nav-card-mant">
+                <div>
+                    <div class="nav-card-icon"><i class="bi bi-tools"></i></div>
+                    <div class="nav-card-title">Mantenimientos</div>
+                </div>
+                <div class="nav-card-value">{{ total_mantenimientos }}</div>
+            </a>
+
+            <!-- Reportes / Gastos -->
+            {% if request.user.is_superuser %}
+            <div class="nav-card nav-card-reportes">
+                <button class="nav-card-dropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div>
+                        <div class="nav-card-icon"><i class="bi bi-bar-chart-line"></i></div>
+                        <div class="nav-card-title">Reportes</div>
+                    </div>
+                    <div class="nav-card-value d-flex align-items-center gap-1">
+                        <i class="bi bi-chevron-down" style="font-size:.7rem;"></i>
+                    </div>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-reportes">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'contabilidad:dashboard_contabilidad' %}">
+                            <i class="bi bi-calculator"></i> Contabilidad
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'reportes:reporte_viajes' %}">
+                            <i class="bi bi-sign-turn-right"></i> Reporte de Viajes
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'reportes:reporte_mantenimiento' %}">
+                            <i class="bi bi-tools"></i> Reporte de Mantenimiento
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'reportes:reporte_conductores' %}">
+                            <i class="bi bi-people"></i> Reporte de Conductores
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {% else %}
+            <a href="{% url 'gastos:lista_gastos' %}" class="nav-card nav-card-gastos">
+                <div>
+                    <div class="nav-card-icon"><i class="bi bi-cash-coin"></i></div>
+                    <div class="nav-card-title">Gastos de Ruta</div>
+                </div>
+                <div class="nav-card-value">${{ total_gastos|floatformat:0|intcomma }}</div>
+            </a>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    // =============================================
+    // Reloj en tiempo real
+    // =============================================
+    function updateDateTime() {
+        var now = new Date();
+        var options = { weekday: 'long', day: 'numeric', month: 'long' };
+        var dateEl = document.getElementById('current-date');
+        var timeEl = document.getElementById('current-time');
+
+        if (dateEl) {
+            dateEl.textContent = now.toLocaleDateString('es-CO', options);
+        }
+        if (timeEl) {
+            timeEl.textContent = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+        }
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 30000);
+
+    // =============================================
+    // Toasts
+    // =============================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var iconMap = {
+            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
+        };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter toast-' + type;
+        toast.innerHTML = (iconMap[type] || iconMap.info) +
+            '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    // Django messages → Toast
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                showToast('{{ message|escapejs }}', 'success');
+            {% elif message.tags == 'error' %}
+                showToast('{{ message|escapejs }}', 'error');
+            {% else %}
+                showToast('{{ message|escapejs }}', 'info');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
+
+{% endblock %}

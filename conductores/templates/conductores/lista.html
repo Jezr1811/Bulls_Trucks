@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulls Trucks — Conductores</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --fg: #1a2332;
+      --muted: #6b7280;
+      --accent: #2F80ED;
+      --accent-hover: #1a6fd4;
+      --accent-light: #dbeafe;
+      --card: #ffffff;
+      --border: #e9ecef;
+      --danger: #ef4444;
+      --success: #16a34a;
+      --info: #3b82f6;
+      --navy: #111827;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding-top: 64px;
+      min-height: 100vh;
+    }
+
+        /* ================= NAVBAR ================= */
+        .topbar {
+            height: 75px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,.08);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: #2F80ED;
+        }
+
+        .icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f3f4f6;
+            cursor: pointer;
+            transition: .25s;
+            border: none;
+        }
+
+        .icon-btn:hover {
+            background: #2F80ED;
+            color: white;
+        }
+
+        /* ================= CONTENIDO ================= */
+        .page {
+            padding: 30px;
+            margin-top: 80px;
+        }
+
+        /* ================= TARJETAS ================= */
+        .card {
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 4px 18px rgba(0,0,0,.08);
+        }
+
+        /* ================= BOTONES ================= */
+        .btn {
+            border-radius: 10px;
+        }
+
+        /* ================= OFFCANVAS ================= */
+        .offcanvas {
+            width: 280px;
+        }
+
+        .menu-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            border-radius: 12px;
+            color: #444;
+            text-decoration: none;
+            transition: .2s;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .menu-link:hover {
+            background: #2F80ED;
+            color: white;
+        }
+
+        .menu-link i {
+            font-size: 20px;
+        }
+
+        .dashboard-card {
+            border: none;
+            border-radius: 22px;
+            overflow: hidden;
+            transition: all .30s ease;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 35px rgba(0,0,0,.18);
+        }
+
+        .dashboard-card .card-body {
+            padding: 28px;
+        }
+
+        .dashboard-card h5 {
+            font-weight: 600;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-card h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .dashboard-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            background: rgba(255,255,255,.18);
+            margin: auto;
+        }
+    /* ============ SCROLLBAR ============ */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 3px; }
+
+    /* ============ ANIMACIONES ============ */
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(.92) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes slideRight {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(100%); }
+    }
+
+    .animate-slide-up {
+      animation: slideUp .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .animate-scale-in {
+      animation: scaleIn .3s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ CONTENIDO PRINCIPAL ============ */
+    .page-header-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) {
+      .page-header-bar {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+    }
+
+    .accent-bar {
+      width: 6px;
+      height: 2rem;
+      border-radius: 99px;
+      background: linear-gradient(to bottom, #60a5fa, #2F80ED);
+      flex-shrink: 0;
+    }
+
+    /* ============ BOTÓN PRIMARIO ============ */
+    .btn-bulls {
+      background: linear-gradient(135deg, #2F80ED, #1a6fd4);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      font-size: .875rem;
+      padding: .6rem 1.35rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(47,128,237,.28);
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-bulls:hover {
+      background: linear-gradient(135deg, #1a6fd4, #155ab0);
+      box-shadow: 0 6px 20px rgba(47,128,237,.35);
+      transform: translateY(-1px);
+      color: #fff;
+    }
+    .btn-bulls:active { transform: translateY(0); }
+
+    /* ============ TABLA ============ */
+    .table-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+
+    .table-search-bar {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(248,249,250,.5);
+    }
+
+    .search-input {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .55rem .9rem .55rem 2.4rem;
+      font-size: .875rem;
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+    }
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,128,237,.1);
+      outline: none;
+    }
+
+    .filter-select {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .55rem .9rem;
+      font-size: .875rem;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .filter-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,128,237,.1);
+      outline: none;
+    }
+
+    .drivers-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    .drivers-table thead tr {
+      background: rgba(248,249,250,.7);
+      border-bottom: 1px solid var(--border);
+    }
+    .drivers-table th {
+      padding: .85rem 1.25rem;
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #9ca3af;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .drivers-table th:last-child { text-align: right; }
+
+    .drivers-table td {
+      padding: .9rem 1.25rem;
+      border-bottom: 1px solid #f3f4f6;
+      vertical-align: middle;
+    }
+    .drivers-table td:last-child { text-align: right; }
+    .drivers-table tbody tr:last-child td { border-bottom: none; }
+
+    .drivers-table tbody tr {
+      transition: background .12s, box-shadow .12s;
+    }
+    .drivers-table tbody tr:hover {
+      background: #f8fbff;
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    /* Celda nombre con avatar */
+    .driver-name-cell {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+    }
+    .driver-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #2c5282);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .driver-name { font-weight: 500; color: var(--fg); }
+
+    /* Licencia badge */
+    .license-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: #f8f9fa;
+      border: 1px solid var(--border);
+      color: #4b5563;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: .75rem;
+      padding: .25rem .6rem;
+      border-radius: 6px;
+    }
+    .license-badge i { font-size: .65rem; color: #9ca3af; }
+
+    /* Estado badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .75rem;
+      font-weight: 500;
+      padding: .25rem .65rem;
+      border-radius: 99px;
+      border: 1px solid;
+    }
+    .status-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .status-activo { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .status-activo .dot { background: #16a34a; }
+    .status-inactivo { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+    .status-inactivo .dot { background: #f59e0b; }
+    .status-vencido { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .status-vencido .dot { background: #ef4444; }
+
+    /* Acciones */
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .78rem;
+      font-weight: 500;
+      padding: .3rem .6rem;
+      border-radius: 8px;
+      transition: all .15s;
+      text-decoration: none;
+      border: none;
+      background: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .action-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1.5px;
+      transition: width .2s;
+    }
+    .action-link:hover::after { width: 70%; }
+
+    .action-edit { color: #3b82f6; }
+    .action-edit:hover { background: #eff6ff; color: #2563eb; }
+    .action-edit::after { background: #3b82f6; }
+
+    .action-delete { color: #ef4444; }
+    .action-delete:hover { background: #fef2f2; color: #dc2626; }
+    .action-delete::after { background: #ef4444; }
+
+    .action-sep { color: #e5e7eb; margin: 0 .15rem; user-select: none; }
+
+    /* Footer tabla */
+    .table-footer {
+      padding: .75rem 1.25rem;
+      border-top: 1px solid var(--border);
+      background: rgba(248,249,250,.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: #9ca3af;
+    }
+
+    /* Estado vacío */
+    .empty-state {
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+
+    /* ============ MODAL ============ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17,24,39,.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1050;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal-box {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.2);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header-custom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 1.5rem 0;
+    }
+    .modal-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .15s;
+      font-size: 1.1rem;
+    }
+    .modal-close-btn:hover { background: #f3f4f6; color: #4b5563; }
+
+    .modal-form-body { padding: 1.25rem 1.5rem; }
+
+    .form-label-custom {
+      display: block;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: .4rem;
+    }
+    .form-label-custom .req { color: #f87171; }
+
+    .form-input {
+      width: 100%;
+      padding: .6rem .9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .875rem;
+      transition: border-color .2s, box-shadow .2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,128,237,.1);
+      outline: none;
+    }
+
+    .form-select-custom {
+      width: 100%;
+      padding: .6rem .9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .875rem;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+    }
+    .form-select-custom:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47,128,237,.1);
+      outline: none;
+    }
+
+    .modal-footer-custom {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .75rem;
+      padding: 0 1.5rem 1.5rem;
+    }
+    .btn-cancel {
+      padding: .6rem 1.2rem;
+      border-radius: 12px;
+      font-size: .875rem;
+      font-weight: 500;
+      color: #6b7280;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-cancel:hover { background: #f3f4f6; }
+
+    /* Delete modal */
+    .delete-modal-box {
+      max-width: 400px;
+    }
+    .delete-icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #fef2f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .btn-danger-bulls {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      border: none;
+      font-weight: 600;
+      font-size: .875rem;
+      padding: .6rem 1.2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(239,68,68,.25);
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .btn-danger-bulls:hover {
+      box-shadow: 0 6px 20px rgba(239,68,68,.35);
+      transform: translateY(-1px);
+    }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+      position: fixed;
+      top: 80px;
+      right: 1rem;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+      pointer-events: none;
+    }
+    .toast-item {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.12);
+      padding: .75rem 1rem;
+      min-width: 260px;
+      max-width: 380px;
+      border-left: 4px solid;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-item.toast-warning { border-left-color: #f59e0b; }
+
+    .toast-dismiss {
+      background: none;
+      border: none;
+      color: #d1d5db;
+      cursor: pointer;
+      font-size: .85rem;
+      padding: 2px;
+      transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 767.98px) {
+      .drivers-table th:nth-child(4),
+      .drivers-table td:nth-child(4) {
+        display: none;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .drivers-table th:nth-child(3),
+      .drivers-table td:nth-child(3) {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============ TOAST CONTAINER ============ -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ============ NAVBAR ============ -->
+   <nav class="navbar navbar-expand-lg topbar fixed-top">
+        <div class="container-fluid">
+            <a href="{% url 'usuarios:dashboard' %}" class="logo">
+                Summary 🚛 Bulls <span>Trucks</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown">
+                    <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notificaciones">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius: 12px; width: 280px; margin-top: 10px;">
+                        <li class="dropdown-header font-weight-bold text-dark pb-2">Notificaciones</li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item rounded-2 py-2" style="font-size: 14px;" href="#">🚚 Viaje #104 asignado con éxito.</a></li>
+                        <li><a class="dropdown-item rounded-2 py-2 text-danger" style="font-size: 14px;" href="#">⚠️ Vencimiento de SOAT próximo.</a></li>
+                    </ul>
+                </div>
+
+                <button class="icon-btn" onclick="location.reload()" title="Actualizar">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+
+                <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline m-0 p-0">
+                    {% csrf_token %}
+                    <button type="submit" class="icon-btn" title="Cerrar sesión">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+
+                <button class="icon-btn" data-bs-toggle="offcanvas" data-bs-target="#menu" title="Menú">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="menu">
+        <div class="offcanvas-header">
+            <h4 class="menu-title">Bulls Trucks</h4>
+            <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body">
+            <a class="menu-link" href="{% url 'usuarios:dashboard' %}">
+                <i class="bi bi-speedometer2"></i>
+                Dashboard
+            </a>
+
+            {% if request.user.is_superuser %}
+                <a class="menu-link" href="{% url 'conductores:lista_conductores' %}">
+                    <i class="bi bi-person-fill"></i>
+                    Conductores
+                </a>
+
+                <a class="menu-link" href="{% url 'vehiculos:lista_vehiculos' %}">
+                    <i class="bi bi-truck"></i>
+                    Vehículos
+                </a>
+
+                <a class="menu-link" href="{% url 'trailers:lista_trailers' %}">
+                    <i class="bi bi-box-seam"></i>
+                    Trailers
+                </a>
+            {% endif %}
+
+            <a class="menu-link" href="{% url 'viajes:lista_viajes' %}">
+                <i class="bi bi-sign-turn-right"></i>
+                Viajes
+            </a>
+
+            <a class="menu-link" href="{% url 'gastos:lista_gastos' %}">
+                <i class="bi bi-cash-stack"></i>
+                Gastos
+            </a>
+
+            <a class="menu-link" href="{% url 'documentos:lista_documentos' %}">
+                <i class="bi bi-file-earmark-text"></i>
+                Documentos
+            </a>
+
+            <a class="menu-link" href="{% url 'mantenimientos:lista_mantenimientos' %}">
+                <i class="bi bi-tools"></i>
+                Mantenimientos
+            </a>
+
+           {% if request.user.is_superuser %}
+                <a class="menu-link" href="{% url 'contabilidad:dashboard_contabilidad' %}">
+                    <i class="bi bi-wallet2"></i>
+                    Contabilidad
+                </a>
+
+                <a class="menu-link d-flex justify-content-between align-items-center" 
+                   data-bs-toggle="collapse" 
+                   href="#menuReportes" 
+                   role="button" 
+                   aria-expanded="false" 
+                   aria-controls="menuReportes">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-bar-chart-fill"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <i class="bi bi-chevron-down arrow-icon" style="font-size: 0.85rem;"></i>
+                </a>
+
+                <div class="collapse ms-3" id="menuReportes">
+                    <a class="menu-link py-2" href="{% url 'reportes:reporte_viajes' %}" style="font-size: 0.95rem;">
+                        <i class="bi bi-circle" style="font-size: 0.5rem; margin-right: 5px;"></i>
+                        Reporte de Viajes
+                    </a>
+                    <a class="menu-link py-2" href="{% url 'reportes:reporte_mantenimiento' %}" style="font-size: 0.95rem;">
+                        <i class="bi bi-circle" style="font-size: 0.5rem; margin-right: 5px;"></i>
+                        Reporte de Mantenimiento
+                    </a>
+                    <a class="menu-link py-2" href="{% url 'reportes:reporte_conductores' %}" style="font-size: 0.95rem;">
+                        <i class="bi bi-circle" style="font-size: 0.5rem; margin-right: 5px;"></i>
+                        Reporte de Conductores
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container-fluid page">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+
+  <!-- ============ CONTENIDO PRINCIPAL ============ -->
+  <main class="flex-1">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8" style="max-width:80rem;margin:0 auto;padding:2rem 1.5rem;">
+
+      <!-- Encabezado -->
+      <div class="animate-slide-up mb-6 page-header-bar">
+        <div class="d-flex align-items-center gap-2">
+          <div class="accent-bar"></div>
+          <div>
+            <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.9rem;letter-spacing:-.03em;color:var(--fg);margin:0;line-height:1.15;">Conductores</h1>
+            <p style="font-size:.85rem;color:#9ca3af;margin:.2rem 0 0;">Gestiona la información de los conductores registrados</p>
+          </div>
+        </div>
+        <button class="btn-bulls" onclick="openModal()" aria-label="Nuevo Conductor">
+          <i class="bi bi-plus-lg" style="font-size:.8rem;"></i>
+          Nuevo Conductor
+        </button>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-card animate-slide-up" style="animation-delay:.1s;">
+        <!-- Barra de búsqueda -->
+        <div class="table-search-bar">
+          <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center">
+            <div class="position-relative flex-grow-1">
+              <i class="bi bi-search" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:#d1d5db;font-size:.85rem;"></i>
+              <input
+                type="text"
+                id="search-input"
+                class="search-input"
+                placeholder="Buscar conductor por nombre, licencia o correo..."
+                oninput="filterDrivers()"
+                aria-label="Buscar conductor"
+              >
+            </div>
+            <select id="status-filter" class="filter-select" onchange="filterDrivers()" aria-label="Filtrar por estado">
+              <option value="all">Todos los estados</option>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+              <option value="Vencido">Vencido</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div style="overflow-x:auto;">
+          <table class="drivers-table" id="drivers-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Licencia</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="drivers-tbody">
+              <!-- Generado con JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado vacío -->
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div class="empty-state-icon">
+            <i class="bi bi-person-slash" style="font-size:1.5rem;color:#d1d5db;"></i>
+          </div>
+          <p style="color:#9ca3af;font-weight:500;margin:0;">No se encontraron conductores</p>
+          <p style="color:#d1d5db;font-size:.85rem;margin:.3rem 0 0;">Intenta con otro término de búsqueda</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="table-footer">
+          <span id="table-count">Mostrando 2 conductor(es)</span>
+          <div class="d-flex align-items-center gap-1">
+            <button class="btn btn-sm" disabled style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#d1d5db;background:transparent;border:none;" aria-label="Página anterior">
+              <i class="bi bi-chevron-left" style="font-size:.7rem;"></i>
+            </button>
+            <button class="btn btn-sm" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;border:none;font-size:.75rem;font-weight:600;" aria-label="Página 1">1</button>
+            <button class="btn btn-sm" disabled style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#d1d5db;background:transparent;border:none;" aria-label="Página siguiente">
+              <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============ MODAL: CREAR / EDITAR ============ -->
+  <div id="modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="modal-content" class="modal-box animate-scale-in">
+      <div class="modal-header-custom">
+        <div>
+          <h2 id="modal-title" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;color:var(--fg);margin:0;">Nuevo Conductor</h2>
+          <p style="font-size:.85rem;color:#9ca3af;margin:.15rem 0 0;">Completa los datos del conductor</p>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal()" aria-label="Cerrar modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <form id="driver-form" onsubmit="handleSubmit(event)" class="modal-form-body">
+        <input type="hidden" id="edit-id" value="">
+        <div class="row g-3">
+          <div class="col-12">
+            <label for="field-name" class="form-label-custom">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="field-name" class="form-input" required placeholder="Ej: Juan Esteban Zapata">
+          </div>
+          <div class="col-sm-6">
+            <label for="field-license" class="form-label-custom">Licencia <span class="req">*</span></label>
+            <input type="text" id="field-license" class="form-input" required placeholder="Ej: C1-348291">
+          </div>
+          <div class="col-sm-6">
+            <label for="field-phone" class="form-label-custom">Teléfono <span class="req">*</span></label>
+            <input type="tel" id="field-phone" class="form-input" required placeholder="Ej: 312465432">
+          </div>
+          <div class="col-12">
+            <label for="field-email" class="form-label-custom">Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="field-email" class="form-input" required placeholder="Ej: juanzapata@gmail.com">
+          </div>
+          <div class="col-12">
+            <label for="field-status" class="form-label-custom">Estado</label>
+            <select id="field-status" class="form-select-custom">
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+              <option value="Vencido">Vencido</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer-custom" style="padding:1.25rem 0 0;">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+          <button type="submit" id="submit-btn" class="btn-bulls">
+            <i class="bi bi-check-lg" style="font-size:.85rem;"></i>
+            <span id="submit-text">Guardar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ MODAL: ELIMINAR ============ -->
+  <div id="delete-overlay" class="modal-overlay" role="dialog" aria-modal="true">
+    <div id="delete-content" class="modal-box delete-modal-box animate-scale-in" style="padding:2rem;text-align:center;">
+      <div class="delete-icon-circle">
+        <i class="bi bi-trash3" style="font-size:1.3rem;color:#ef4444;"></i>
+      </div>
+      <h3 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.15rem;color:var(--fg);margin:0 0 .35rem;">Eliminar Conductor</h3>
+      <p id="delete-msg" style="font-size:.875rem;color:#9ca3af;margin:0 0 1.5rem;">¿Estás seguro de eliminar este conductor? Esta acción no se puede deshacer.</p>
+      <div class="d-flex gap-3 justify-content-center">
+        <button onclick="closeDeleteModal()" class="btn-cancel" style="flex:1;border:1px solid var(--border);border-radius:12px;padding:.6rem;">Cancelar</button>
+        <button onclick="confirmDelete()" class="btn-danger-bulls" style="flex:1;">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // =============================================
+    // Base de datos local
+    // =============================================
+    let drivers = [
+      {
+        id: 1,
+        nombre: 'Juan Esteban Zapata',
+        licencia: 'C1-348291',
+        telefono: '312465432',
+        correo: 'juanzapata@gmail.com',
+        estado: 'Activo'
+      },
+      {
+        id: 2,
+        nombre: 'Juan Zapata',
+        licencia: 'C2-984012',
+        telefono: '3001234567',
+        correo: 'juan@gmail.com',
+        estado: 'Activo'
+      }
+    ];
+
+    let nextId = 3;
+    let deleteTargetId = null;
+
+    // =============================================
+    // Renderizado
+    // =============================================
+    function renderTable(data) {
+      const tbody = document.getElementById('drivers-tbody');
+      const emptyState = document.getElementById('empty-state');
+      const countEl = document.getElementById('table-count');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        countEl.textContent = 'Sin resultados';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      countEl.textContent = `Mostrando ${data.length} conductor(es)`;
+
+      tbody.innerHTML = data.map((d, i) => `
+        <tr style="animation:slideUp .35s cubic-bezier(.22,1,.36,1) ${i * .04}s both;">
+          <td>
+            <div class="driver-name-cell">
+              <div class="driver-avatar">${getInitials(d.nombre)}</div>
+              <span class="driver-name">${escapeHtml(d.nombre)}</span>
+            </div>
+          </td>
+          <td>
+            <span class="license-badge">
+              <i class="bi bi-person-vcard"></i>
+              ${escapeHtml(d.licencia)}
+            </span>
+          </td>
+          <td><span style="color:#4b5563;">${escapeHtml(d.telefono)}</span></td>
+          <td><span style="color:#4b5563;">${escapeHtml(d.correo)}</span></td>
+          <td>${statusBadge(d.estado)}</td>
+          <td>
+            <div class="d-flex align-items-center justify-content-end gap-1">
+              <button onclick="openEditModal(${d.id})" class="action-link action-edit" title="Editar" aria-label="Editar ${escapeHtml(d.nombre)}">
+                <i class="bi bi-pencil-square" style="font-size:.75rem;"></i>
+                Editar
+              </button>
+              <span class="action-sep">|</span>
+              <button onclick="openDeleteModal(${d.id})" class="action-link action-delete" title="Eliminar" aria-label="Eliminar ${escapeHtml(d.nombre)}">
+                <i class="bi bi-trash3" style="font-size:.75rem;"></i>
+                Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function statusBadge(estado) {
+      const cls = { 'Activo': 'status-activo', 'Inactivo': 'status-inactivo', 'Vencido': 'status-vencido' };
+      const c = cls[estado] || 'status-activo';
+      return `<span class="status-badge ${c}"><span class="dot"></span>${estado}</span>`;
+    }
+
+    function getInitials(name) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // =============================================
+    // Filtros
+    // =============================================
+    function filterDrivers() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('status-filter').value;
+
+      const filtered = drivers.filter(d => {
+        const matchSearch = !query ||
+          d.nombre.toLowerCase().includes(query) ||
+          d.licencia.toLowerCase().includes(query) ||
+          d.correo.toLowerCase().includes(query);
+        const matchStatus = statusFilter === 'all' || d.estado === statusFilter;
+        return matchSearch && matchStatus;
+      });
+
+      renderTable(filtered);
+    }
+
+    // =============================================
+    // Modal: Crear / Editar
+    // =============================================
+    function openModal() {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('modal-title').textContent = 'Nuevo Conductor';
+      document.getElementById('submit-text').textContent = 'Guardar';
+      document.getElementById('driver-form').reset();
+      document.getElementById('field-status').value = 'Activo';
+      showModalOverlay('modal-overlay', 'modal-content');
+    }
+
+    function openEditModal(id) {
+      const driver = drivers.find(d => d.id === id);
+      if (!driver) return;
+      document.getElementById('edit-id').value = id;
+      document.getElementById('modal-title').textContent = 'Editar Conductor';
+      document.getElementById('submit-text').textContent = 'Actualizar';
+      document.getElementById('field-name').value = driver.nombre;
+      document.getElementById('field-license').value = driver.licencia;
+      document.getElementById('field-phone').value = driver.telefono;
+      document.getElementById('field-email').value = driver.correo;
+      document.getElementById('field-status').value = driver.estado;
+      showModalOverlay('modal-overlay', 'modal-content');
+    }
+
+    function closeModal() {
+      hideModalOverlay('modal-overlay');
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      const editId = document.getElementById('edit-id').value;
+      const nombre = document.getElementById('field-name').value.trim();
+      const licencia = document.getElementById('field-license').value.trim();
+      const telefono = document.getElementById('field-phone').value.trim();
+      const correo = document.getElementById('field-email').value.trim();
+      const estado = document.getElementById('field-status').value;
+
+      if (!nombre || !licencia || !telefono || !correo) {
+        showToast('Por favor completa todos los campos obligatorios', 'error');
+        return;
+      }
+
+      if (editId) {
+        const idx = drivers.findIndex(d => d.id === parseInt(editId));
+        if (idx !== -1) {
+          drivers[idx] = { ...drivers[idx], nombre, licencia, telefono, correo, estado };
+          showToast(`Conductor "${nombre}" actualizado correctamente`, 'success');
+        }
+      } else {
+        drivers.push({ id: nextId++, nombre, licencia, telefono, correo, estado });
+        showToast(`Conductor "${nombre}" registrado correctamente`, 'success');
+      }
+
+      closeModal();
+      filterDrivers();
+    }
+
+    // =============================================
+    // Modal: Eliminar
+    // =============================================
+    function openDeleteModal(id) {
+      deleteTargetId = id;
+      const driver = drivers.find(d => d.id === id);
+      if (driver) {
+        document.getElementById('delete-msg').textContent =
+          `¿Estás seguro de eliminar a "${driver.nombre}"? Esta acción no se puede deshacer.`;
+      }
+      showModalOverlay('delete-overlay', 'delete-content');
+    }
+
+    function closeDeleteModal() {
+      hideModalOverlay('delete-overlay');
+      deleteTargetId = null;
+    }
+
+    function confirmDelete() {
+      if (deleteTargetId !== null) {
+        const driver = drivers.find(d => d.id === deleteTargetId);
+        const name = driver ? driver.nombre : 'Conductor';
+        drivers = drivers.filter(d => d.id !== deleteTargetId);
+        showToast(`Conductor "${name}" eliminado`, 'success');
+        filterDrivers();
+      }
+      closeDeleteModal();
+    }
+
+    // =============================================
+    // Utilidades Modal
+    // =============================================
+    function showModalOverlay(overlayId, contentId) {
+      const overlay = document.getElementById(overlayId);
+      const content = document.getElementById(contentId);
+      overlay.classList.add('show');
+      content.classList.add('animate-scale-in');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => {
+        const firstInput = content.querySelector('input:not([type=hidden]), select');
+        if (firstInput) firstInput.focus();
+      }, 120);
+    }
+
+    function hideModalOverlay(overlayId) {
+      const overlay = document.getElementById(overlayId);
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Cerrar con Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeDeleteModal();
+      }
+    });
+
+    // Cerrar clickeando fuera
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeModal();
+    });
+    document.getElementById('delete-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeDeleteModal();
+    });
+
+    // =============================================
+    // Toasts
+    // =============================================
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const iconMap = {
+        success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+        error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+        info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>',
+        warning: '<i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;font-size:1.1rem;"></i>'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `toast-item toast-enter toast-${type}`;
+      toast.innerHTML = `
+        ${iconMap[type]}
+        <span style="font-size:.85rem;color:#374151;flex:1;">${message}</span>
+        <button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar notificación">
+          <i class="bi bi-x"></i>
+        </button>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => dismissToast(toast.querySelector('button')), 3500);
+    }
+
+    function dismissToast(btn) {
+      const toast = btn.closest('.toast-item');
+      if (!toast) return;
+      toast.classList.remove('toast-enter');
+      toast.classList.add('toast-exit');
+      setTimeout(() => toast.remove(), 300);
+    }
+
+    // =============================================
+    // Init
+    // =============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTable(drivers);
+    });
+  </script>
+
+</body>
+</html>

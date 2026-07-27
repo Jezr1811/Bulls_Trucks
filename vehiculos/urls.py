@@ -1,0 +1,30 @@
+from django.urls import path
+from . import views
+
+app_name = "vehiculos"
+
+urlpatterns = [
+    path(
+        "",
+        views.lista_vehiculos,
+        name="lista_vehiculos"
+    ),
+
+    path(
+        "nuevo/",
+        views.crear_vehiculo,
+        name="crear_vehiculo"
+    ),
+
+    path(
+        "editar/<int:pk>/",
+        views.editar_vehiculo,
+        name="editar_vehiculo"
+    ),
+
+    path(
+        "eliminar/<int:pk>/",
+        views.eliminar_vehiculo,
+        name="eliminar_vehiculo"
+    ),
+]

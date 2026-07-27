@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .form-wrapper {
+        max-width: 580px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        border: 1px solid #eef2f7;
+        overflow: hidden;
+        animation: slideUp .5s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-header {
+        padding: 1.5rem 1.75rem;
+        border-bottom: 1px solid #eef2f7;
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
+
+    .form-header-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #5b2c8e, #7c3aed);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .form-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .form-header p {
+        font-size: .82rem;
+        color: #9ca3af;
+        margin: .1rem 0 0;
+    }
+
+    .form-body {
+        padding: 1.5rem 1.75rem;
+    }
+
+    /* ---- Campos del formulario Django ---- */
+    .form-body p {
+        margin-bottom: 1.1rem;
+    }
+
+    .form-body label {
+        display: block;
+        font-size: .85rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: .35rem;
+    }
+
+    .form-body input[type="text"],
+    .form-body input[type="number"],
+    .form-body input[type="email"],
+    .form-body input[type="tel"],
+    .form-body input[type="date"],
+    .form-body textarea,
+    .form-body select {
+        width: 100%;
+        padding: .6rem .9rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: .875rem;
+        font-family: 'Inter', sans-serif;
+        color: #1f2937;
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+    .form-body input:focus,
+    .form-body textarea:focus,
+    .form-body select:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 3px rgba(124,58,237,.1);
+        outline: none;
+    }
+
+    .form-body input::placeholder,
+    .form-body textarea::placeholder {
+        color: #d1d5db;
+    }
+
+    /* Errores de validación Django */
+    .form-body .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: .3rem 0 0;
+    }
+
+    .form-body .errorlist li {
+        font-size: .78rem;
+        color: #ef4444;
+        font-weight: 500;
+    }
+
+    /* Help text */
+    .form-body .helptext {
+        display: block;
+        font-size: .75rem;
+        color: #9ca3af;
+        margin-top: .25rem;
+    }
+
+    /* ---- Botones ---- */
+    .form-footer {
+        padding: 1.25rem 1.75rem;
+        border-top: 1px solid #eef2f7;
+        background: #fafbfc;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .75rem;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: .6rem 1.5rem;
+        font-weight: 600;
+        font-size: .875rem;
+        cursor: pointer;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        box-shadow: 0 4px 14px rgba(124,58,237,.25);
+    }
+
+    .btn-save:hover {
+        background: linear-gradient(135deg, #6d28d9, #5b21b6);
+        box-shadow: 0 6px 20px rgba(124,58,237,.35);
+        transform: translateY(-1px);
+    }
+
+    .btn-save:active { transform: translateY(0); }
+
+    .btn-cancel {
+        background: transparent;
+        color: #6b7280;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 12px;
+        padding: .6rem 1.3rem;
+        font-weight: 500;
+        font-size: .875rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+    }
+
+    .btn-cancel:hover {
+        background: #f3f4f6;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+</style>
+
+
+<div class="form-wrapper">
+    <div class="form-card">
+
+        <div class="form-header">
+            <div class="form-header-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div>
+                <h1>Formulario de Trailer</h1>
+                <p>Completa los datos del formulario</p>
+            </div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-body">
+                {{ form.as_p }}
+            </div>
+
+            <div class="form-footer">
+                <a href="{% url 'trailers:lista_trailers' %}" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i>
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-lg"></i>
+                    Guardar
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 750px; margin: 0 auto; padding-bottom: 50px;">
+    
+    <h4 class="text-center fw-bold my-4 text-dark">Viaje # {{ viaje.id }}</h4>
+
+    <div class="card border-0 rounded-4 p-4 mb-3 shadow-sm" style="background-color: #e5e7eb;">
+        <h5 class="fw-bold mb-3 text-dark">Información del viaje</h5>
+        <div class="row g-3" style="font-size: 0.95rem;">
+            <div class="col-6 text-secondary fw-semibold">Ruta:</div>
+            <div class="col-6 text-dark fw-bold text-end">{{ viaje.origen }} - {{ viaje.destino }}</div>
+            
+            <div class="col-6 text-secondary fw-semibold">Cliente:</div>
+            <div class="col-6 text-dark text-end">{{ viaje.cliente }}</div>
+            
+            <div class="col-6 text-secondary fw-semibold">Conductor:</div>
+            <div class="col-6 text-dark text-end">{{ viaje.conductor }}</div>
+            
+            <div class="col-6 text-secondary fw-semibold">Vehículo:</div>
+            <div class="col-6 text-dark text-end">{{ viaje.vehiculo }}</div>
+
+            <div class="col-6 text-secondary fw-semibold">Fecha de Inicio:</div>
+            <div class="col-6 text-dark text-end">{{ viaje.fecha_inicio|date:"d/m/Y" }}</div>
+        </div>
+    </div>
+
+    <div class="w-100 py-3 text-center rounded-pill fw-bold mb-4 shadow-sm text-dark" 
+         style="font-size: 1.1rem; 
+                {% if viaje.estado == 'pendiente' %} background-color: #fef08a; color: #713f12;
+                {% elif viaje.estado == 'en_curso' %} background-color: #a7f3d0; color: #064e3b;
+                {% elif viaje.estado == 'finalizado' %} background-color: #bfdbfe; color: #1e3a8a;
+                {% else %} background-color: #fca5a5; color: #7f1d1d; {% endif %}">
+        Estado actual: <span class="text-uppercase">{{ viaje.get_estado_display }}</span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-5">
+            <div class="card border-0 rounded-4 p-3 shadow-sm h-100" style="background-color: #e5e7eb;">
+                <h6 class="fw-bold mb-3 text-dark">Resultados del viaje</h6>
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="text-muted">Ingreso:</span>
+                    <span class="fw-bold">${{ viaje.flete }}</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Gasto total:</span>
+                    <span class="fw-bold text-danger">${{ viaje.total_gastos }}</span>
+                </div>
+                <hr class="my-2 border-secondary">
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Total:</span>
+                    <span class="fw-bolder text-success">${{ viaje.resultado }}</span>
+                </div>
+
+                <div class="d-flex flex-column gap-2 mt-4">
+                    {% if viaje.estado == 'pendiente' %}
+                        <a href="{% url 'viajes:cambiar_estado' viaje.id 'iniciar' %}" class="btn w-100 py-2 fw-bold text-dark rounded-3 shadow-sm" style="background-color: #4eff6e;">
+                            Iniciar viaje
+                        </a>
+                    {% elif viaje.estado == 'en_curso' %}
+                        <a href="{% url 'viajes:cambiar_estado' viaje.id 'terminar' %}" class="btn w-100 py-2 fw-bold text-dark rounded-3 shadow-sm" style="background-color: #ffcbc1;">
+                            Terminar viaje
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card border-0 rounded-4 p-3 shadow-sm" style="background-color: #e5e7eb;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold m-0 text-dark">Historial de Gastos</h6>
+                    <a href="{% url 'gastos:registrar_gasto' viaje.id %}" class="text-decoration-none text-dark fw-bold small">
+                        Agregar <span class="fs-5 fw-bold ms-1">+</span>
+                    </a>
+                </div>
+
+                <div class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto;">
+                    {% for gasto in viaje.gasto_set.all %}
+                        <div class="p-2 rounded-3 d-flex justify-content-between align-items-center" style="background-color: #ffcbc1; color: #5c1d1d;">
+                            <div>
+                                <div class="fw-bold text-capitalize small">{{ gasto.get_tipo_display }}</div>
+                                <small class="opacity-75" style="font-size: 0.75rem;">Fecha: {{ gasto.fecha|date:"d/m/Y" }}</small>
+                            </div>
+                            <strong class="small">${{ gasto.valor }}</strong>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4 text-muted small">No hay gastos registrados en esta ruta.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button class="btn w-100 py-2 fw-bold text-dark rounded-3 mt-3 shadow-sm" style="background-color: #ffcbc1;">
+                Ingresar incidente
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
