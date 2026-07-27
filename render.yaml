@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: bulls-trucks
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Proyecto_Personal.wsgi"
