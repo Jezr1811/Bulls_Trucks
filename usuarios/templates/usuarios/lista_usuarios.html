@@ -2,227 +2,654 @@
 
 {% block content %}
 
-<main class="flex-1">
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
 
+    :root {
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --accent-light: #dbeafe;
+        --border: #eef2f7;
+        --fg: #1f2937;
+        --muted: #9ca3af;
+        --indigo: #6366f1;
+    }
+
+    /* ============ HEADER ============ */
+    .page-header-bar {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @media (min-width: 640px) {
+        .page-header-bar {
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+    }
+
+    .accent-bar {
+        width: 6px;
+        height: 2rem;
+        border-radius: 99px;
+        background: linear-gradient(to bottom, #818cf8, #6366f1);
+        flex-shrink: 0;
+    }
+
+    .page-header-bar h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--fg);
+        margin: 0;
+        letter-spacing: -.03em;
+        line-height: 1.15;
+    }
+    .page-header-bar p {
+        font-size: .85rem;
+        color: var(--muted);
+        margin: .15rem 0 0;
+    }
+
+    .btn-bulls {
+        background: linear-gradient(135deg, #2F80ED, #1a6fd4);
+        color: #fff;
+        border: none;
+        font-weight: 600;
+        font-size: .875rem;
+        padding: .6rem 1.35rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(47,128,237,.25);
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+    }
+    .btn-bulls:hover {
+        background: linear-gradient(135deg, #1a6fd4, #155ab0);
+        box-shadow: 0 6px 20px rgba(47,128,237,.35);
+        transform: translateY(-1px);
+        color: #fff;
+    }
+
+    /* ============ TABLE CARD ============ */
+    .table-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 12px rgba(0,0,0,.04);
+        overflow: hidden;
+        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .08s forwards;
+        opacity: 0;
+    }
+
+    .table-toolbar {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(248,249,250,.5);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+
+    .header-icon {
+        width: 34px; height: 34px;
+        border-radius: 9px;
+        background: linear-gradient(135deg, #4338ca, #6366f1);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .9rem;
+        flex-shrink: 0;
+    }
+
+    .header-left h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--fg);
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: .65rem;
+        flex-wrap: wrap;
+    }
+
+    .table-search {
+        position: relative;
+    }
+    .table-search .bi-search {
+        position: absolute;
+        left: .7rem; top: 50%; transform: translateY(-50%);
+        color: #d1d5db; font-size: .8rem; pointer-events: none;
+    }
+    .table-search input {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem .4rem 2rem;
+        font-size: .82rem;
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+        width: 210px;
+    }
+    .table-search input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    .filter-select {
+        border: 1.5px solid #e5e7eb;
+        border-radius: 9px;
+        padding: .4rem .75rem;
+        font-size: .82rem;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color .2s, box-shadow .2s;
+        font-family: 'Inter', sans-serif;
+    }
+    .filter-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(47,128,237,.08);
+        outline: none;
+    }
+
+    /* ============ TABLE ============ */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .85rem;
+    }
+    .custom-table thead {
+        background: rgba(248,250,252,.8);
+        border-bottom: 1px solid var(--border);
+    }
+    .custom-table th {
+        font-size: .68rem;
+        font-weight: 600;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: .8rem 1.15rem;
+        border: none;
+        white-space: nowrap;
+        text-align: left;
+    }
+    .custom-table th:last-child { text-align: right; }
+    .custom-table td {
+        padding: .8rem 1.15rem;
+        vertical-align: middle;
+        border-top: 1px solid #f3f6fa;
+        color: #4b5563;
+    }
+    .custom-table td:last-child { text-align: right; }
+    .custom-table tbody tr {
+        transition: background .15s, box-shadow .15s;
+    }
+    .custom-table tbody tr:hover {
+        background: #f5f3ff;
+        box-shadow: inset 3px 0 0 #6366f1;
+    }
+
+    /* User cell */
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+    }
+    .user-avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4338ca, #6366f1);
+        color: #fff;
+        font-size: .72rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .user-username {
+        font-weight: 600;
+        color: var(--fg);
+        font-size: .88rem;
+    }
+
+    /* Nombre */
+    .user-fullname {
+        font-weight: 500;
+        color: var(--fg);
+    }
+
+    /* Correo */
+    .user-email {
+        color: #4b5563;
+    }
+
+    /* Role badges */
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .25rem .7rem;
+        border-radius: 99px;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+    .role-badge .dot {
+        width: 5px; height: 5px; border-radius: 50%;
+    }
+    .role-admin {
+        background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe;
+    }
+    .role-admin .dot { background: #7c3aed; }
+    .role-conductor {
+        background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;
+    }
+    .role-conductor .dot { background: #3b82f6; }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: .3rem;
+        font-size: .72rem;
+        font-weight: 600;
+        padding: .25rem .7rem;
+        border-radius: 99px;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+    .status-badge .dot {
+        width: 5px; height: 5px; border-radius: 50%;
+    }
+    .status-activo {
+        background: #ecfdf5; color: #047857; border-color: #a7f3d0;
+    }
+    .status-activo .dot { background: #16a34a; }
+    .status-inactivo {
+        background: #fef2f2; color: #b91c1c; border-color: #fecaca;
+    }
+    .status-inactivo .dot { background: #ef4444; }
+
+    /* Actions */
+    .action-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        font-size: .78rem;
+        font-weight: 500;
+        padding: .3rem .6rem;
+        border-radius: 8px;
+        transition: all .15s;
+        text-decoration: none;
+        border: none;
+        background: none;
+        cursor: pointer;
+    }
+    .action-edit { color: #3b82f6; }
+    .action-edit:hover { background: #eff6ff; color: #2563eb; }
+    .action-deactivate { color: #ef4444; }
+    .action-deactivate:hover { background: #fef2f2; color: #dc2626; }
+    .action-activate { color: #16a34a; }
+    .action-activate:hover { background: #ecfdf5; color: #047857; }
+    .action-sep { color: #e5e7eb; margin: 0 .15rem; user-select: none; }
+
+    /* Footer */
+    .table-footer {
+        padding: .7rem 1.15rem;
+        border-top: 1px solid var(--border);
+        background: rgba(248,249,250,.4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: .75rem;
+        color: var(--muted);
+    }
+    .table-footer .page-btn {
+        width: 30px; height: 30px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        border: none; font-size: .75rem; font-weight: 600;
+    }
+    .page-btn-active { background: #6366f1; color: #fff; }
+    .page-btn-disabled { background: transparent; color: #d1d5db; }
+
+    /* Empty */
+    .empty-state {
+        padding: 3.5rem 1rem;
+        text-align: center;
+    }
+    .empty-icon {
+        width: 64px; height: 64px; border-radius: 50%;
+        background: #f5f3ff;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    .empty-icon i { font-size: 1.5rem; color: #c4b5fd; }
+    .empty-title { color: #6b7280; font-weight: 600; font-size: .95rem; margin: 0 0 .3rem; }
+    .empty-desc { color: #d1d5db; font-size: .82rem; margin: 0; }
+
+    #filter-empty { display: none; }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed; top: 90px; right: 1rem; z-index: 9999;
+        display: flex; flex-direction: column; gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex; align-items: center; gap: .65rem;
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
+        border-left: 4px solid; font-size: .85rem; color: #374151;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-dismiss {
+        background: none; border: none; color: #d1d5db;
+        cursor: pointer; font-size: .85rem; padding: 2px;
+        transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 767.98px) {
+        .custom-table th:nth-child(3),
+        .custom-table td:nth-child(3) { display: none; }
+        .table-search input { width: 160px; }
+    }
+    @media (max-width: 575.98px) {
+        .page-header-bar h1 { font-size: 1.5rem; }
+        .custom-table th:nth-child(2),
+        .custom-table td:nth-child(2) { display: none; }
+        .header-right { width: 100%; }
+        .table-search input { width: 100%; }
+        .table-search { flex: 1; }
+        .action-link span { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
+        }
+    }
+</style>
+
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<main class="flex-1">
     <div style="max-width:80rem;margin:0 auto;padding:2rem 1.5rem;">
 
-        <!-- Encabezado -->
-
-        <div class="animate-slide-up page-header-bar mb-4">
-
+        <!-- Header -->
+        <div class="page-header-bar">
             <div class="d-flex align-items-center gap-2">
-
                 <div class="accent-bar"></div>
-
                 <div>
-                    <h1 style="margin:0;">Usuarios</h1>
-                    <p style="margin:0;color:#6b7280;">
-                        Gestiona los usuarios del sistema.
-                    </p>
+                    <h1>Usuarios</h1>
+                    <p>Gestiona los usuarios del sistema</p>
                 </div>
-
             </div>
-
-            <a
-                href="{% url 'usuarios:crear_usuario' %}"
-                class="btn-bulls"
-                style="text-decoration:none;"
-            >
+            <a href="{% url 'usuarios:crear_usuario' %}" class="btn-bulls" style="text-decoration:none;">
                 <i class="bi bi-plus-lg"></i>
                 Nuevo Usuario
             </a>
-
         </div>
 
-        <div class="table-card animate-slide-up">
+        <!-- Table Card -->
+        <div class="table-card">
+            <div class="table-toolbar">
+                <div class="header-left">
+                    <div class="header-icon"><i class="bi bi-people"></i></div>
+                    <h3>Lista de Usuarios</h3>
+                </div>
+                <div class="header-right">
+                    <div class="table-search">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="table-search" placeholder="Buscar usuario..." oninput="filterTable()" aria-label="Buscar usuario">
+                    </div>
+                    <select id="role-filter" class="filter-select" onchange="filterTable()" aria-label="Filtrar por rol">
+                        <option value="all">Todos</option>
+                        <option value="admin">Administradores</option>
+                        <option value="conductor">Conductores</option>
+                    </select>
+                    <select id="status-filter" class="filter-select" onchange="filterTable()" aria-label="Filtrar por estado">
+                        <option value="all">Todos</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+            </div>
 
             <div style="overflow-x:auto;">
-
-                <table class="vehicles-table">
-
+                <table class="custom-table" id="users-table">
                     <thead>
-
                         <tr>
-
                             <th>Usuario</th>
                             <th>Nombre</th>
                             <th>Correo</th>
                             <th>Rol</th>
                             <th>Estado</th>
-                            <th style="width:180px;">Acciones</th>
-
+                            <th>Acciones</th>
                         </tr>
-
                     </thead>
-
-                    <tbody>
-
-                    {% for usuario in usuarios %}
-
-                        <tr>
+                    <tbody id="table-tbody">
+                        {% for usuario in usuarios %}
+                        <tr data-search="{{ usuario.username|lower }} {{ usuario.first_name|lower }} {{ usuario.last_name|lower }} {{ usuario.email|lower }}"
+                            data-role="{% if usuario.is_superuser %}admin{% else %}conductor{% endif %}"
+                            data-status="{% if usuario.is_active %}activo{% else %}inactivo{% endif %}">
 
                             <td>
-
-                                <div class="vehicle-plate-cell">
-
-                                    <div class="vehicle-icon-avatar">
-
-                                        <i class="bi bi-person"></i>
-
-                                    </div>
-
-                                    <span class="vehicle-plate">
-
-                                        {{ usuario.username }}
-
-                                    </span>
-
+                                <div class="user-cell">
+                                    <div class="user-avatar">{{ usuario.username|make_list|first|upper }}</div>
+                                    <span class="user-username">{{ usuario.username }}</span>
                                 </div>
-
                             </td>
 
                             <td>
-
-                                {{ usuario.first_name }} {{ usuario.last_name }}
-
+                                <span class="user-fullname">{{ usuario.first_name }} {{ usuario.last_name }}</span>
                             </td>
 
                             <td>
-
-                                {{ usuario.email }}
-
+                                <span class="user-email">{{ usuario.email }}</span>
                             </td>
 
                             <td>
-
                                 {% if usuario.is_superuser %}
-
-                                    <span class="status-badge status-activo">
-
-                                        <span class="dot"></span>
-
-                                        Administrador
-
-                                    </span>
-
+                                    <span class="role-badge role-admin"><span class="dot"></span>Administrador</span>
                                 {% else %}
-
-                                    <span class="status-badge status-mantenimiento">
-
-                                        <span class="dot"></span>
-
-                                        Conductor
-
-                                    </span>
-
+                                    <span class="role-badge role-conductor"><span class="dot"></span>Conductor</span>
                                 {% endif %}
-
                             </td>
 
                             <td>
-
                                 {% if usuario.is_active %}
-
-                                    <span class="status-badge status-activo">
-
-                                        <span class="dot"></span>
-
-                                        Activo
-
-                                    </span>
-
+                                    <span class="status-badge status-activo"><span class="dot"></span>Activo</span>
                                 {% else %}
-
-                                    <span class="status-badge status-inactivo">
-
-                                        <span class="dot"></span>
-
-                                        Inactivo
-
-                                    </span>
-
+                                    <span class="status-badge status-inactivo"><span class="dot"></span>Inactivo</span>
                                 {% endif %}
-
                             </td>
 
                             <td>
-
-                                <div class="d-flex gap-2">
-
-                                    <a
-                                        href="{% url 'usuarios:editar_usuario' usuario.id %}"
-                                        class="btn btn-warning btn-sm"
-                                        title="Editar"
-                                    >
+                                <div class="d-flex align-items-center justify-content-end gap-1">
+                                    <a href="{% url 'usuarios:editar_usuario' usuario.id %}" class="action-link action-edit" title="Editar usuario">
                                         <i class="bi bi-pencil-square"></i>
+                                        <span>Editar</span>
                                     </a>
-
+                                    <span class="action-sep">|</span>
                                     {% if usuario.is_active %}
-
-                                        <a
-                                            href="{% url 'usuarios:desactivar_usuario' usuario.id %}"
-                                            class="btn btn-danger btn-sm"
-                                            title="Desactivar"
-                                        >
-                                            <i class="bi bi-person-x"></i>
-                                        </a>
-
+                                    <a href="{% url 'usuarios:desactivar_usuario' usuario.id %}" class="action-link action-deactivate" title="Desactivar usuario">
+                                        <i class="bi bi-person-x"></i>
+                                        <span>Desactivar</span>
+                                    </a>
                                     {% else %}
-
-                                        <a
-                                            href="{% url 'usuarios:activar_usuario' usuario.id %}"
-                                            class="btn btn-success btn-sm"
-                                            title="Activar"
-                                        >
-                                            <i class="bi bi-person-check"></i>
-                                        </a>
-
+                                    <a href="{% url 'usuarios:activar_usuario' usuario.id %}" class="action-link action-activate" title="Activar usuario">
+                                        <i class="bi bi-person-check"></i>
+                                        <span>Activar</span>
+                                    </a>
                                     {% endif %}
-
                                 </div>
-
                             </td>
 
                         </tr>
-
-                    {% empty %}
-
-                        <tr>
-
+                        {% empty %}
+                        <tr id="empty-row">
                             <td colspan="6">
-
                                 <div class="empty-state">
-
-                                    <div class="empty-state-icon">
-
-                                        <i class="bi bi-people"></i>
-
-                                    </div>
-
-                                    <p>
-
-                                        No existen usuarios registrados.
-
-                                    </p>
-
+                                    <div class="empty-icon"><i class="bi bi-people"></i></div>
+                                    <p class="empty-title">No existen usuarios registrados</p>
+                                    <p class="empty-desc">Los usuarios aparecerán aquí al crearlos</p>
                                 </div>
-
                             </td>
-
                         </tr>
-
-                    {% endfor %}
-
+                        {% endfor %}
                     </tbody>
-
                 </table>
-
             </div>
 
+            <!-- Filtro vacío -->
+            <div id="filter-empty" class="empty-state">
+                <div class="empty-icon"><i class="bi bi-search"></i></div>
+                <p class="empty-title">Sin resultados</p>
+                <p class="empty-desc">Intenta con otro término de búsqueda o filtro</p>
+            </div>
+
+            {% if usuarios %}
+            <div class="table-footer">
+                <span id="table-count">Mostrando {{ usuarios.count }} usuario(s)</span>
+                <div class="d-flex align-items-center gap-1">
+                    <button class="page-btn page-btn-disabled" disabled aria-label="Página anterior">
+                        <i class="bi bi-chevron-left" style="font-size:.7rem;"></i>
+                    </button>
+                    <button class="page-btn page-btn-active" aria-label="Página 1">1</button>
+                    <button class="page-btn page-btn-disabled" disabled aria-label="Página siguiente">
+                        <i class="bi bi-chevron-right" style="font-size:.7rem;"></i>
+                    </button>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
     </div>
-
 </main>
+
+
+<script>
+    // =============================================
+    // Búsqueda y filtros
+    // =============================================
+    function filterTable() {
+        var query = document.getElementById('table-search').value.toLowerCase().trim();
+        var roleFilter = document.getElementById('role-filter').value;
+        var statusFilter = document.getElementById('status-filter').value;
+        var rows = document.querySelectorAll('#table-tbody tr[data-search]');
+        var filterEmpty = document.getElementById('filter-empty');
+        var visible = 0;
+
+        rows.forEach(function(row) {
+            var searchText = row.getAttribute('data-search') || '';
+            var role = row.getAttribute('data-role') || '';
+            var status = row.getAttribute('data-status') || '';
+
+            var matchSearch = !query || searchText.includes(query);
+            var matchRole = roleFilter === 'all' || role === roleFilter;
+            var matchStatus = statusFilter === 'all' || status === statusFilter;
+
+            if (matchSearch && matchRole && matchStatus) {
+                row.style.display = '';
+                visible++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        var emptyRow = document.getElementById('empty-row');
+        var hasDjangoData = !emptyRow;
+
+        if (hasDjangoData && filterEmpty) {
+            filterEmpty.style.display = visible === 0 ? 'block' : 'none';
+        }
+
+        var countEl = document.getElementById('table-count');
+        if (countEl) countEl.textContent = 'Mostrando ' + visible + ' usuario(s)';
+    }
+
+    // =============================================
+    // Toasts
+    // =============================================
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var iconMap = {
+            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
+        };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter toast-' + type;
+        toast.innerHTML = (iconMap[type] || iconMap.info) +
+            '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    // Django messages → Toast
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                showToast('{{ message|escapejs }}', 'success');
+            {% elif message.tags == 'error' %}
+                showToast('{{ message|escapejs }}', 'error');
+            {% else %}
+                showToast('{{ message|escapejs }}', 'info');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
 
 {% endblock %}

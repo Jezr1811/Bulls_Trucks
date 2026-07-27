@@ -2,150 +2,526 @@
 
 {% block content %}
 
-<main class="flex-1">
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(100%); }
+    }
 
-    <div style="max-width:700px;margin:0 auto;padding:2rem 1.5rem;">
+    :root {
+        --accent: #2F80ED;
+        --accent-hover: #1a6fd4;
+        --accent-light: #dbeafe;
+        --border: #eef2f7;
+        --fg: #1f2937;
+        --muted: #9ca3af;
+        --indigo: #6366f1;
+    }
 
-        <!-- Encabezado -->
+    /* ============ WRAPPER ============ */
+    .form-wrapper {
+        max-width: 620px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+    }
 
-        <div class="page-header-bar animate-slide-up mb-4">
+    /* ============ BACK LINK ============ */
+    .form-back {
+        display: inline-flex;
+        align-items: center;
+        gap: .45rem;
+        font-size: .82rem;
+        font-weight: 500;
+        color: var(--muted);
+        text-decoration: none;
+        margin-bottom: 1.25rem;
+        transition: color .2s;
+        animation: slideUp .4s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    .form-back:hover { color: var(--indigo); }
+    .form-back i { font-size: .75rem; }
 
-            <div class="d-flex align-items-center gap-2">
+    /* ============ CARD ============ */
+    .form-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 20px rgba(0,0,0,.06);
+        overflow: hidden;
+        animation: slideUp .5s cubic-bezier(.22,1,.36,1) forwards;
+        position: relative;
+    }
 
-                <div class="accent-bar"></div>
+    .form-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #6366f1, #818cf8, #6366f1);
+        background-size: 200% 100%;
+        animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
 
-                <div>
+    /* ============ HEADER ============ */
+    .form-header {
+        padding: 1.5rem 1.75rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+    }
 
-                    <h1 style="margin:0;">Nuevo Usuario</h1>
+    .form-header-icon {
+        width: 42px; height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4338ca, #6366f1);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(99,102,241,.25);
+    }
 
-                    <p style="margin:0;color:#6b7280;">
-                        Registra un nuevo usuario del sistema.
-                    </p>
+    .form-header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--fg);
+        margin: 0;
+    }
 
+    .form-header p {
+        font-size: .82rem;
+        color: var(--muted);
+        margin: .1rem 0 0;
+    }
+
+    /* ============ BODY ============ */
+    .form-body {
+        padding: 1.35rem 1.75rem;
+    }
+
+    /* Section labels */
+    .section-label {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--muted);
+        margin-bottom: .85rem;
+        margin-top: 1.15rem;
+    }
+    .section-label:first-child { margin-top: 0; }
+    .section-label i { font-size: .8rem; }
+    .section-divider {
+        border: none;
+        border-top: 1px dashed #e5e7eb;
+        margin: 1rem 0;
+    }
+
+    /* Grid */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .form-field { margin-bottom: 0; }
+    .form-field.full { grid-column: 1 / -1; }
+
+    /* Labels */
+    .form-field label,
+    .form-field .form-label-custom {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        font-size: .82rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: .4rem;
+    }
+    .form-field .req { color: #ef4444; font-weight: 700; font-size: .9rem; line-height: 1; }
+
+    /* Inputs */
+    .form-field input[type="text"],
+    .form-field input[type="email"],
+    .form-field input[type="tel"],
+    .form-field input[type="password"],
+    .form-field input[type="number"],
+    .form-field input[type="date"],
+    .form-field select {
+        width: 100%;
+        padding: .6rem .9rem;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: .875rem;
+        font-family: 'Inter', sans-serif;
+        color: var(--fg);
+        background: #fff;
+        transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    .form-field input:hover,
+    .form-field select:hover {
+        border-color: #d1d5db;
+    }
+    .form-field input:focus,
+    .form-field select:focus {
+        border-color: var(--indigo);
+        box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+        outline: none;
+        background: #faf5ff;
+    }
+    .form-field input::placeholder { color: #d1d5db; }
+
+    /* Django error list */
+    .form-field .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: .3rem 0 0;
+        display: flex;
+        align-items: center;
+        gap: .3rem;
+    }
+    .form-field .errorlist li {
+        font-size: .78rem;
+        color: #ef4444;
+        font-weight: 500;
+    }
+    .form-field .errorlist li::before {
+        content: '\F33A';
+        font-family: 'bootstrap-icons';
+        font-size: .7rem;
+        margin-right: .15rem;
+    }
+
+    /* Help text */
+    .form-field .helptext {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+        font-size: .73rem;
+        color: var(--muted);
+        margin-top: .3rem;
+        font-style: italic;
+    }
+    .form-field .helptext::before {
+        content: '\F431';
+        font-family: 'bootstrap-icons';
+        font-size: .65rem;
+    }
+
+    /* ============ ERRORS BOX ============ */
+    .form-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 12px;
+        padding: .85rem 1rem;
+        margin-bottom: 1.15rem;
+    }
+    .form-errors h6 {
+        color: #b91c1c;
+        font-size: .85rem;
+        font-weight: 700;
+        margin: 0 0 .35rem;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+    .form-errors ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        font-size: .8rem;
+        color: #991b1b;
+    }
+
+    /* ============ FOOTER ============ */
+    .form-footer {
+        padding: 1.25rem 1.75rem;
+        border-top: 1px solid var(--border);
+        background: #fafbfc;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: .75rem;
+    }
+
+    .btn-cancel {
+        background: transparent;
+        color: #6b7280;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 12px;
+        padding: .6rem 1.3rem;
+        font-weight: 500;
+        font-size: .875rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        font-family: 'Inter', sans-serif;
+    }
+    .btn-cancel:hover {
+        background: #f3f4f6;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: .6rem 1.5rem;
+        font-weight: 600;
+        font-size: .875rem;
+        cursor: pointer;
+        transition: all .2s;
+        display: inline-flex;
+        align-items: center;
+        gap: .4rem;
+        box-shadow: 0 4px 14px rgba(99,102,241,.25);
+        font-family: 'Inter', sans-serif;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #4f46e5, #4338ca);
+        box-shadow: 0 6px 20px rgba(99,102,241,.35);
+        transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ============ TOAST ============ */
+    #toast-container {
+        position: fixed; top: 90px; right: 1rem; z-index: 9999;
+        display: flex; flex-direction: column; gap: .65rem;
+        pointer-events: none;
+    }
+    .toast-item {
+        pointer-events: auto;
+        display: flex; align-items: center; gap: .65rem;
+        background: #fff; border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0,0,0,.12);
+        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
+        border-left: 4px solid; font-size: .85rem; color: #374151;
+    }
+    .toast-item.toast-success { border-left-color: #16a34a; }
+    .toast-item.toast-error { border-left-color: #ef4444; }
+    .toast-item.toast-info { border-left-color: #2F80ED; }
+    .toast-dismiss {
+        background: none; border: none; color: #d1d5db;
+        cursor: pointer; font-size: .85rem; padding: 2px;
+        transition: color .15s;
+    }
+    .toast-dismiss:hover { color: #6b7280; }
+    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
+    .toast-exit { animation: slideOut .3s ease forwards; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 575.98px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .form-wrapper { padding: 1.25rem 1rem; }
+        .form-header,
+        .form-body,
+        .form-footer {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+    }
+</style>
+
+
+<!-- Toast container -->
+<div id="toast-container" aria-live="polite"></div>
+
+<div class="form-wrapper">
+
+    <!-- Back link -->
+    <a href="{% url 'usuarios:lista_usuarios' %}" class="form-back">
+        <i class="bi bi-arrow-left"></i>
+        Volver a Usuarios
+    </a>
+
+    <div class="form-card">
+
+        <!-- Header -->
+        <div class="form-header">
+            <div class="form-header-icon">
+                <i class="bi bi-person-plus"></i>
+            </div>
+            <div>
+                <h1>Nuevo Usuario</h1>
+                <p>Registra un nuevo usuario del sistema</p>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="form-body">
+            <form method="POST">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                <div class="form-errors">
+                    <h6><i class="bi bi-exclamation-triangle"></i> Corrige los siguientes errores</h6>
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
+                {% endif %}
+
+                <!-- Section: Datos de cuenta -->
+                <div class="section-label">
+                    <i class="bi bi-shield-lock"></i>
+                    Datos de Cuenta
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Usuario <span class="req">*</span></label>
+                        {{ form.username }}
+                    </div>
+                    <div class="form-field">
+                        <label>Correo <span class="req">*</span></label>
+                        {{ form.email }}
+                    </div>
+                    <div class="form-field">
+                        <label>Contraseña <span class="req">*</span></label>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="form-field">
+                        <label>Confirmar Contraseña <span class="req">*</span></label>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Section: Datos personales -->
+                <div class="section-label">
+                    <i class="bi bi-person-vcard"></i>
+                    Datos Personales
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Nombres <span class="req">*</span></label>
+                        {{ form.first_name }}
+                    </div>
+                    <div class="form-field">
+                        <label>Apellidos <span class="req">*</span></label>
+                        {{ form.last_name }}
+                    </div>
+                    <div class="form-field">
+                        <label>Tipo de usuario</label>
+                        {{ form.tipo_usuario }}
+                    </div>
+                    <div class="form-field">
+                        <label>Teléfono</label>
+                        {{ form.telefono }}
+                    </div>
+                </div>
+
+                {% if form.nombre_conductor or form.correo_conductor %}
+                <hr class="section-divider">
+
+                <!-- Section: Datos del conductor -->
+                <div class="section-label">
+                    <i class="bi bi-id-card"></i>
+                    Datos del Conductor
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Nombre del conductor</label>
+                        {{ form.nombre_conductor }}
+                    </div>
+                    <div class="form-field">
+                        <label>Correo del conductor</label>
+                        {{ form.correo_conductor }}
+                    </div>
+                </div>
+                {% endif %}
 
             </div>
 
-        </div>
-
-        <div class="table-card animate-slide-up">
-
-            <form method="POST">
-
-                {% csrf_token %}
-
-                <div class="row g-3">
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Usuario
-                        </label>
-
-                        {{ form.username }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Correo
-                        </label>
-
-                        {{ form.email }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Nombres
-                        </label>
-
-                        {{ form.first_name }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Apellidos
-                        </label>
-
-                        {{ form.last_name }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Tipo de usuario
-                        </label>
-
-                        {{ form.tipo_usuario }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Nombre del conductor
-                        </label>
-
-                        {{ form.nombre_conductor }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Teléfono
-                        </label>
-
-                        {{ form.telefono }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Correo del conductor
-                        </label>
-
-                        {{ form.correo_conductor }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Contraseña
-                        </label>
-
-                        {{ form.password1 }}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">
-                            Confirmar contraseña
-                        </label>
-
-                        {{ form.password2 }}
-                    </div>
-
-                </div>
-
-                <hr class="my-4">
-
-                <div class="d-flex justify-content-end gap-2">
-
-                    <a
-                        href="{% url 'usuarios:lista_usuarios' %}"
-                        class="btn btn-secondary"
-                    >
-                        Cancelar
-                    </a>
-
-                    <button
-                        type="submit"
-                        class="btn-bulls"
-                    >
-                        <i class="bi bi-person-plus-fill"></i>
-
-                        Crear Usuario
-                    </button>
-
-                </div>
+            <!-- Footer -->
+            <div class="form-footer">
+                <a href="{% url 'usuarios:lista_usuarios' %}" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i>
+                    Cancelar
+                </a>
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-check-lg"></i>
+                    Crear Usuario
+                </button>
+            </div>
 
             </form>
-
         </div>
 
     </div>
+</div>
 
-</main>
+
+<script>
+    function showToast(message, type) {
+        type = type || 'info';
+        var container = document.getElementById('toast-container');
+        var iconMap = {
+            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
+            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
+            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
+        };
+        var toast = document.createElement('div');
+        toast.className = 'toast-item toast-enter toast-' + type;
+        toast.innerHTML = (iconMap[type] || iconMap.info) +
+            '<span style="flex:1;">' + message + '</span>' +
+            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
+        container.appendChild(toast);
+        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
+    }
+
+    function dismissToast(btn) {
+        var toast = btn.closest('.toast-item');
+        if (!toast) return;
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(function() { toast.remove(); }, 300);
+    }
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                showToast('{{ message|escapejs }}', 'success');
+            {% elif message.tags == 'error' %}
+                showToast('{{ message|escapejs }}', 'error');
+            {% else %}
+                showToast('{{ message|escapejs }}', 'info');
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
 
 {% endblock %}
