@@ -14,7 +14,8 @@ from documentos.models import Documento
 from django.contrib import messages
 from django.contrib.auth.models import User
 from usuarios.decorators import admin_required
-
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -230,55 +231,36 @@ def editar_usuario(request, pk):
 
 @login_required
 @admin_required
-def desactivar_usuario(request, pk):
-
-    usuario = User.objects.get(pk=pk)
-
-    if usuario != request.user:
-        usuario.is_active = False
-        usuario.save()
-        messages.success(request, "Usuario desactivado correctamente.")
-
-    return redirect("usuarios:lista_usuarios")
-
-
-@login_required
-@admin_required
-def activar_usuario(request, pk):
-
-    usuario = User.objects.get(pk=pk)
-
-    usuario.is_active = True
-    usuario.save()
-
-    messages.success(request, "Usuario activado correctamente.")
-
-    return redirect("usuarios:lista_usuarios")
-
-@login_required
-@admin_required
 def desactivar_usuario(request, usuario_id):
 
-    usuario = User.objects.get(id=usuario_id)
+    try:
+        usuario = User.objects.get(id=usuario_id)
 
-    # Evita que un administrador se desactive a sí mismo
-    if usuario != request.user:
-        usuario.is_active = False
-        usuario.save()
-        messages.success(request, "Usuario desactivado correctamente.")
+        if usuario != request.user:
+            usuario.is_active = False
+            usuario.save()
+            messages.success(request, "Usuario desactivado correctamente.")
+        else:
+            messages.error(request, "No puedes desactivar tu propio usuario.")
 
-    return redirect("usuarios:lista_usuarios")
+        return redirect("usuarios:lista_usuarios")
 
+    except Exception as e:
+        return HttpResponse(str(e))
+    
 
 @login_required
 @admin_required
 def activar_usuario(request, usuario_id):
 
-    usuario = User.objects.get(id=usuario_id)
+    try:
+        usuario = User.objects.get(id=usuario_id)
+        usuario.is_active = True
+        usuario.save()
 
-    usuario.is_active = True
-    usuario.save()
+        messages.success(request, "Usuario activado correctamente.")
 
-    messages.success(request, "Usuario activado correctamente.")
+        return redirect("usuarios:lista_usuarios")
 
-    return redirect("usuarios:lista_usuarios")
+    except Exception as e:
+        return HttpResponse(str(e))
