@@ -514,14 +514,24 @@
                                     </a>
                                     <span class="action-sep">|</span>
                                     {% if usuario.is_active %}
-                                    <a href="{% url 'usuarios:desactivar_usuario' usuario.id %}" class="action-link action-deactivate" title="Desactivar usuario">
+                                    <a
+                                        href="#"
+                                        class="action-link action-deactivate"
+                                        onclick="abrirModalDesactivar('{{ usuario.id }}','{{ usuario.username }}')">
+
                                         <i class="bi bi-person-x"></i>
                                         <span>Desactivar</span>
+
                                     </a>
                                     {% else %}
-                                    <a href="{% url 'usuarios:activar_usuario' usuario.id %}" class="action-link action-activate" title="Activar usuario">
+                                   <a
+                                        href="#"
+                                        class="action-link action-activate"
+                                        onclick="abrirModalActivar('{{ usuario.id }}','{{ usuario.username }}')">
+
                                         <i class="bi bi-person-check"></i>
                                         <span>Activar</span>
+
                                     </a>
                                     {% endif %}
                                 </div>
@@ -567,6 +577,118 @@
         </div>
 
     </div>
+<!-- Modal Confirmar Desactivación -->
+<div class="modal fade" id="modalDesactivarUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4">
+
+            <div class="modal-header border-0 pb-0">
+
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-person-x text-danger me-2"></i>
+                    Desactivar usuario
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body pt-2">
+
+                <p class="mb-0">
+                    ¿Estás seguro de que deseas desactivar al usuario
+                    <strong id="nombreUsuario"></strong>?
+                </p>
+
+                <small class="text-muted">
+                    El usuario no podrá iniciar sesión hasta que vuelva a ser activado.
+                </small>
+
+            </div>
+
+            <div class="modal-footer border-0">
+
+                <button
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <a
+                    id="btnConfirmarDesactivar"
+                    class="btn btn-danger">
+
+                    <i class="bi bi-person-x me-1"></i>
+
+                    Desactivar
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<!-- Modal Confirmar Activación -->
+<div class="modal fade" id="modalActivarUsuario" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow-lg rounded-4">
+
+            <div class="modal-header border-0 pb-0">
+
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-person-check text-success me-2"></i>
+                    Activar usuario
+                </h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+
+            <div class="modal-body pt-2">
+
+                <p class="mb-0">
+                    ¿Estás seguro de que deseas activar al usuario
+                    <strong id="nombreUsuarioActivar"></strong>?
+                </p>
+
+                <small class="text-muted">
+                    El usuario podrá volver a iniciar sesión en el sistema.
+                </small>
+
+            </div>
+
+            <div class="modal-footer border-0">
+
+                <button
+                    class="btn btn-light"
+                    data-bs-dismiss="modal">
+
+                    Cancelar
+
+                </button>
+
+                <a
+                    id="btnConfirmarActivar"
+                    class="btn btn-success">
+
+                    <i class="bi bi-person-check me-1"></i>
+
+                    Activar
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
 </main>
 
 
@@ -650,6 +772,35 @@
             {% endif %}
         {% endfor %}
     {% endif %}
+    
+    function abrirModalDesactivar(id, nombre){
+
+    document.getElementById("nombreUsuario").textContent = nombre;
+
+    document.getElementById("btnConfirmarDesactivar").href =
+        "/usuarios/" + id + "/desactivar/";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("modalDesactivarUsuario")
+    );
+
+    modal.show();
+
+}
+function abrirModalActivar(id, nombre){
+
+    document.getElementById("nombreUsuarioActivar").textContent = nombre;
+
+    document.getElementById("btnConfirmarActivar").href =
+        "/usuarios/" + id + "/activar/";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("modalActivarUsuario")
+    );
+
+    modal.show();
+
+}
 </script>
 
 {% endblock %}
