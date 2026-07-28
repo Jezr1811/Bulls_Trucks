@@ -7,8 +7,8 @@ from .views import (
     lista_usuarios,
     crear_usuario,
     editar_usuario,
-    activar_usuario,
     desactivar_usuario,
+    activar_usuario,
 )
 
 app_name = "usuarios"
@@ -51,15 +51,15 @@ urlpatterns = [
         name="editar_usuario"
     ),
 
+    
     path(
-        "usuarios/<int:pk>/desactivar/",
-        desactivar_usuario,
-        name="desactivar_usuario"
+    "usuarios/<int:usuario_id>/desactivar/",
+    desactivar_usuario,
+    name="desactivar_usuario"
     ),
-    
-    
+
     path(
-        "usuarios/<int:pk>/activar/",
+        "usuarios/<int:usuario_id>/activar/",
         activar_usuario,
         name="activar_usuario"
     ),
