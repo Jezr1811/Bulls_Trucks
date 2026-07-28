@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from usuarios.decorators import admin_required
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -233,26 +233,28 @@ def editar_usuario(request, pk):
 @admin_required
 def desactivar_usuario(request, usuario_id):
 
-    usuario = User.objects.get(id=usuario_id)
+    usuario = get_object_or_404(User, id=usuario_id)
 
-    usuario.is_active = False
-    usuario.save()
+    if usuario == request.user:
+        messages.error(request, "No puedes desactivar tu propio usuario.")
+    elif usuario.is_superuser:
+        messages.error(request, "No puedes desactivar a un usuario administrador.")
+    else:
+        usuario.is_active = False
+        usuario.save()
+        messages.success(request, "Usuario desactivado correctamente.")
 
     return redirect("usuarios:lista_usuarios")
-    
 
-# @login_required
+@login_required
 @admin_required
 def activar_usuario(request, usuario_id):
 
-    try:
-        usuario = User.objects.get(id=usuario_id)
-        usuario.is_active = True
-        usuario.save()
+    usuario = get_object_or_404(User, id=usuario_id)
 
-        messages.success(request, "Usuario activado correctamente.")
+    usuario.is_active = True
+    usuario.save()
 
-        return redirect("usuarios:lista_usuarios")
+    messages.success(request, "Usuario activado correctamente.")
 
-    except Exception as e:
-        return HttpResponse(str(e))
+    return redirect("usuarios:lista_usuarios")
