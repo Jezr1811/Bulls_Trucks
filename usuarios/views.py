@@ -233,11 +233,11 @@ def editar_usuario(request, pk):
 @admin_required
 def desactivar_usuario(request, usuario_id):
 
-    print("ENTRÓ A LA VISTA")
-
     usuario = User.objects.get(id=usuario_id)
 
-    
+    usuario.is_active = False
+    usuario.save()
+
     return redirect("usuarios:lista_usuarios")
     
 
