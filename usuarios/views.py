@@ -254,3 +254,31 @@ def activar_usuario(request, pk):
     messages.success(request, "Usuario activado correctamente.")
 
     return redirect("usuarios:lista_usuarios")
+
+@login_required
+@admin_required
+def desactivar_usuario(request, usuario_id):
+
+    usuario = User.objects.get(id=usuario_id)
+
+    # Evita que un administrador se desactive a sí mismo
+    if usuario != request.user:
+        usuario.is_active = False
+        usuario.save()
+        messages.success(request, "Usuario desactivado correctamente.")
+
+    return redirect("usuarios:lista_usuarios")
+
+
+@login_required
+@admin_required
+def activar_usuario(request, usuario_id):
+
+    usuario = User.objects.get(id=usuario_id)
+
+    usuario.is_active = True
+    usuario.save()
+
+    messages.success(request, "Usuario activado correctamente.")
+
+    return redirect("usuarios:lista_usuarios")

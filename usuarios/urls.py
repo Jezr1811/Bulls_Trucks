@@ -52,15 +52,18 @@ urlpatterns = [
     ),
 
     path(
+        "usuarios/<int:pk>/desactivar/",
+        desactivar_usuario,
+        name="desactivar_usuario"
+    ),
+    
+    
+    path(
         "usuarios/<int:pk>/activar/",
         activar_usuario,
         name="activar_usuario"
     ),
 
-    path(
-        "usuarios/<int:pk>/desactivar/",
-        desactivar_usuario,
-        name="desactivar_usuario"
-    ),
+
 
 ]
