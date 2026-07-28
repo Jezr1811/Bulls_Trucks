@@ -233,23 +233,15 @@ def editar_usuario(request, pk):
 @admin_required
 def desactivar_usuario(request, usuario_id):
 
-    try:
-        usuario = User.objects.get(id=usuario_id)
+    print("ENTRÓ A LA VISTA")
 
-        if usuario != request.user:
-            usuario.is_active = False
-            usuario.save()
-            messages.success(request, "Usuario desactivado correctamente.")
-        else:
-            messages.error(request, "No puedes desactivar tu propio usuario.")
+    usuario = User.objects.get(id=usuario_id)
 
-        return redirect("usuarios:lista_usuarios")
-
-    except Exception as e:
-        return HttpResponse(str(e))
+    
+    return redirect("usuarios:lista_usuarios")
     
 
-@login_required
+# @login_required
 @admin_required
 def activar_usuario(request, usuario_id):
 
