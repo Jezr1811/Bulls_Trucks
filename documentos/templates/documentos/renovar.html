@@ -95,96 +95,81 @@
                 <div class="row g-3">
 
                     <!-- Imagen -->
-  
-                <div class="col-md-6">
-                    <div class="bg-light rounded-3 p-3 h-100 d-flex flex-column">
-                        <small class="text-muted d-block mb-2">
-                            <i class="bi bi-image me-1"></i>Imagen
-                        </small>
-
-                        {% if documento.imagen and documento.imagen.name %}
-                            <div class="position-relative flex-grow-1 rounded-3 overflow-hidden"
-                                style="min-height:200px; cursor:pointer;"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalImagen">
-
-                                <img src="{{ documento.imagen.url }}"
-                                    class="w-100 h-100 rounded-3"
-                                    style="object-fit:cover; min-height:200px;"
-                                    alt="Imagen del documento">
-
-                                <div class="position-absolute bottom-0 end-0 p-2">
-                                    <span class="badge bg-dark bg-opacity-75 rounded-pill small">
-                                        <i class="bi bi-zoom-in"></i> Ampliar
-                                    </span>
+                    <div class="col-md-6">
+                        <div class="bg-light rounded-3 p-3 h-100 d-flex flex-column">
+                            <small class="text-muted d-block mb-2">
+                                <i class="bi bi-image me-1"></i>Imagen
+                            </small>
+                            {% if documento.imagen %}
+                                <div class="position-relative flex-grow-1 rounded-3 overflow-hidden"
+                                     style="min-height:200px; cursor:pointer;"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#modalImagen">
+                                    <img src="{{ documento.imagen.url }}"
+                                         class="w-100 h-100 rounded-3"
+                                         style="object-fit:cover; min-height:200px;"
+                                         alt="Imagen del documento">
+                                    <div class="position-absolute bottom-0 end-0 p-2">
+                                        <span class="badge bg-dark bg-opacity-75 rounded-pill small">
+                                            <i class="bi bi-zoom-in"></i> Ampliar
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-
-                        {% else %}
-
-                            <div class="flex-grow-1 rounded-3 border d-flex align-items-center justify-content-center"
-                                style="min-height:220px;">
-                                <div class="text-center text-muted">
-                                    <i class="bi bi-image fs-1"></i>
-                                    <h6 class="mt-3 mb-1">No hay imagen cargada</h6>
-                                    <small>Este documento no tiene una imagen asociada.</small>
+                            {% else %}
+                                <div class="flex-grow-1 rounded-3 d-flex align-items-center justify-content-center border border-dashed"
+                                     style="min-height:200px;">
+                                    <div class="text-center">
+                                        <i class="bi bi-image text-muted" style="font-size:2.5rem;"></i>
+                                        <p class="text-muted mb-0 mt-2 small">Sin imagen</p>
+                                    </div>
                                 </div>
-                            </div>
-
-                        {% endif %}
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
 
                     <!-- PDF -->
                     <div class="col-md-6">
                         <div class="bg-light rounded-3 p-3 h-100 d-flex flex-column">
-
                             <small class="text-muted d-block mb-2">
                                 <i class="bi bi-file-earmark-pdf me-1"></i>PDF
                             </small>
-
-                            {% if documento.pdf and documento.pdf.name %}
-
+                            {% if documento.pdf %}
                                 <div class="flex-grow-1 rounded-3 overflow-hidden border"
-                                    style="min-height:200px;">
-
-                                    <iframe
-                                        src="{{ documento.pdf.url }}"
-                                        class="w-100"
-                                        style="height:220px;border:none;">
+                                     style="min-height:200px;">
+                                    <iframe src="{{ documento.pdf.url }}"
+                                            class="w-100"
+                                            style="height:220px; border:none;"
+                                            title="PDF del documento">
                                     </iframe>
-
                                 </div>
-
                                 <div class="d-flex gap-2 mt-2">
                                     <a href="{{ documento.pdf.url }}"
-                                    target="_blank"
-                                    class="btn btn-outline-dark btn-sm rounded-pill flex-grow-1">
-                                        <i class="bi bi-box-arrow-up-right me-1"></i>
-                                        Abrir en nueva pestaña
+                                       target="_blank"
+                                       class="btn btn-outline-dark btn-sm rounded-pill flex-grow-1">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>Abrir en nueva pestaña
                                     </a>
-
                                     <a href="{{ documento.pdf.url }}"
-                                    download
-                                    class="btn btn-outline-dark btn-sm rounded-pill">
+                                       download
+                                       class="btn btn-outline-dark btn-sm rounded-pill">
                                         <i class="bi bi-download"></i>
                                     </a>
                                 </div>
-
                             {% else %}
-
-                                <div class="flex-grow-1 rounded-3 border d-flex align-items-center justify-content-center"
-                                    style="min-height:220px;">
-                                    <div class="text-center text-muted">
-                                        <i class="bi bi-file-earmark-pdf fs-1"></i>
-                                        <h6 class="mt-3 mb-1">No hay PDF cargado</h6>
-                                        <small>Este documento no tiene un archivo PDF asociado.</small>
+                                <div class="flex-grow-1 rounded-3 d-flex align-items-center justify-content-center border border-dashed"
+                                     style="min-height:200px;">
+                                    <div class="text-center">
+                                        <i class="bi bi-file-earmark-pdf text-muted" style="font-size:2.5rem;"></i>
+                                        <p class="text-muted mb-0 mt-2 small">Sin PDF</p>
                                     </div>
                                 </div>
-
                             {% endif %}
                         </div>
                     </div>
+
+                </div>
+            </div>
+        </div>
+
         <!-- ====== RENOVACIÓN ====== -->
         <div class="card shadow-sm border-0 rounded-4 mb-4">
             <div class="card-body p-4">
