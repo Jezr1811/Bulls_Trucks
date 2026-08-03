@@ -63,12 +63,13 @@ def crear_conductor(request):
         form = ConductorForm()
 
     return render(
-        request,
-        "conductores/formulario.html",
-        {
-            "form": form,
-        },
-    )
+    request,
+    "conductores/formulario.html",
+    {
+        "form": form,
+        "editar": False,
+    },
+)
 
 
 @login_required
@@ -87,13 +88,14 @@ def editar_conductor(request, pk):
         form = ConductorForm(instance=conductor)
 
     return render(
-        request,
-        "conductores/formulario.html",
-        {
-            "form": form,
-            "conductor": conductor,
-        },
-    )
+    request,
+    "conductores/formulario.html",
+    {
+        "form": form,
+        "conductor": conductor,
+        "editar": True,
+    },
+)
 
 
 @login_required
