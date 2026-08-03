@@ -1,372 +1,344 @@
 {% extends "base.html" %}
 
-{% block title %}Renovar Documento{% endblock %}
+{% block title %}
+Renovar Documento
+{% endblock %}
 
 {% block content %}
 
 <div class="container py-4">
 
     <!-- Encabezado -->
+
     <div class="d-flex align-items-center mb-4">
+
         <a href="{% url 'documentos:lista_documentos' %}"
            class="btn btn-outline-secondary rounded-pill me-3 px-4">
-            <i class="bi bi-arrow-left"></i> Volver
+
+            <i class="bi bi-arrow-left"></i>
+            Volver
+
         </a>
+
         <div>
-            <h2 class="fw-bold mb-0">Renovar Documento</h2>
-            <small class="text-muted">Actualiza la vigencia y los archivos del documento.</small>
+
+            <h2 class="fw-bold mb-0">
+
+                Renovar Documento
+
+            </h2>
+
+            <small class="text-muted">
+
+                Actualiza la vigencia y los archivos del documento.
+
+            </small>
+
         </div>
+
     </div>
 
     <form method="POST" enctype="multipart/form-data">
+
         {% csrf_token %}
 
-        <!-- ====== INFORMACIÓN ACTUAL ====== -->
+        <!-- Información -->
+
         <div class="card shadow-sm border-0 rounded-4 mb-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">
-                    <i class="bi bi-info-circle me-2 text-primary"></i>Información actual
-                </h5>
-                <div class="row g-3">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Tipo</small>
-                            <span class="fw-semibold">{{ documento.get_tipo_display }}</span>
-                        </div>
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Información actual
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p><strong>Tipo:</strong> {{ documento.get_tipo_display }}</p>
+
+                        <p><strong>Vehículo:</strong> {{ documento.vehiculo }}</p>
+
+                        <p><strong>Conductor:</strong> {{ documento.conductor }}</p>
+
+                        <p><strong>Número:</strong> {{ documento.numero }}</p>
+
                     </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Vehículo</small>
-                            <span class="fw-semibold">{{ documento.vehiculo }}</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Conductor</small>
-                            <span class="fw-semibold">{{ documento.conductor }}</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Número</small>
-                            <span class="fw-semibold">{{ documento.numero }}</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Expedición</small>
-                            <span class="fw-semibold">{{ documento.fecha_expedicion|date:"d/m/Y" }}</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Vencimiento</small>
-                            <span class="fw-semibold">{{ documento.fecha_vencimiento|date:"d/m/Y" }}</span>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="bg-light rounded-3 p-3 h-100">
-                            <small class="text-muted d-block mb-1">Estado</small>
-                            {% if documento.estado_real == "vigente" %}
-                                <span class="badge bg-success rounded-pill px-3 py-2">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Vigente
+
+                    <div class="col-md-6">
+
+                        <p><strong>Fecha expedición:</strong> {{ documento.fecha_expedicion }}</p>
+
+                        <p><strong>Fecha vencimiento:</strong> {{ documento.fecha_vencimiento }}</p>
+
+                        <p>
+
+                            <strong>Estado:</strong>
+
+                            {% if documento.estado == "vigente" %}
+
+                                <span class="badge bg-success">
+
+                                    Vigente
+
                                 </span>
-                            {% elif documento.estado_real == "proximo" %}
-                                <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
-                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>Próximo a vencer
+
+                            {% elif documento.estado == "proximo" %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Próximo a vencer
+
                                 </span>
+
                             {% else %}
-                                <span class="badge bg-danger rounded-pill px-3 py-2">
-                                    <i class="bi bi-x-circle-fill me-1"></i>Vencido
+
+                                <span class="badge bg-danger">
+
+                                    Vencido
+
                                 </span>
+
                             {% endif %}
-                        </div>
+
+                        </p>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <!-- ====== ARCHIVOS ACTUALES ====== -->
+        <!-- Archivos -->
+
         <div class="card shadow-sm border-0 rounded-4 mb-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">
-                    <i class="bi bi-paperclip me-2 text-primary"></i>Archivos actuales
-                </h5>
-                <div class="row g-3">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Archivos actuales
+
+                </h4>
+
+                <div class="row">
 
                     <!-- Imagen -->
-                    <div class="col-md-6">
-                        <div class="bg-light rounded-3 p-3 h-100 d-flex flex-column">
-                            <small class="text-muted d-block mb-2">
-                                <i class="bi bi-image me-1"></i>Imagen
-                            </small>
-                            {% if documento.imagen %}
-                                <div class="position-relative flex-grow-1 rounded-3 overflow-hidden"
-                                     style="min-height:200px; cursor:pointer;"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#modalImagen">
-                                    <img src="{{ documento.imagen.url }}"
-                                         class="w-100 h-100 rounded-3"
-                                         style="object-fit:cover; min-height:200px;"
-                                         alt="Imagen del documento">
-                                    <div class="position-absolute bottom-0 end-0 p-2">
-                                        <span class="badge bg-dark bg-opacity-75 rounded-pill small">
-                                            <i class="bi bi-zoom-in"></i> Ampliar
-                                        </span>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="flex-grow-1 rounded-3 d-flex align-items-center justify-content-center border border-dashed"
-                                     style="min-height:200px;">
-                                    <div class="text-center">
-                                        <i class="bi bi-image text-muted" style="font-size:2.5rem;"></i>
-                                        <p class="text-muted mb-0 mt-2 small">Sin imagen</p>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
+
+                    <div class="col-md-6 mb-3">
+
+                        {% if documento.imagen %}
+
+                            <img src="{{ documento.imagen.url }}"
+                                 class="img-fluid rounded-4 shadow w-100"
+                                 style="height:250px;object-fit:cover;">
+
+                        {% else %}
+
+                            <div class="border rounded-4 bg-light text-center d-flex flex-column justify-content-center align-items-center"
+                                 style="height:250px;">
+
+                                <i class="bi bi-image text-secondary"
+                                   style="font-size:70px;"></i>
+
+                                <p class="text-muted mt-3 mb-0">
+
+                                    No hay imagen registrada
+
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
                     </div>
 
                     <!-- PDF -->
-                    <div class="col-md-6">
-                        <div class="bg-light rounded-3 p-3 h-100 d-flex flex-column">
-                            <small class="text-muted d-block mb-2">
-                                <i class="bi bi-file-earmark-pdf me-1"></i>PDF
-                            </small>
+
+                    <div class="col-md-6 mb-3">
+
+                        <div class="border rounded-4 bg-light d-flex justify-content-center align-items-center"
+                             style="height:250px;">
+
                             {% if documento.pdf %}
-                                <div class="flex-grow-1 rounded-3 overflow-hidden border"
-                                     style="min-height:200px;">
-                                    <iframe src="{{ documento.pdf.url }}"
-                                            class="w-100"
-                                            style="height:220px; border:none;"
-                                            title="PDF del documento">
-                                    </iframe>
-                                </div>
-                                <div class="d-flex gap-2 mt-2">
-                                    <a href="{{ documento.pdf.url }}"
-                                       target="_blank"
-                                       class="btn btn-outline-dark btn-sm rounded-pill flex-grow-1">
-                                        <i class="bi bi-box-arrow-up-right me-1"></i>Abrir en nueva pestaña
-                                    </a>
-                                    <a href="{{ documento.pdf.url }}"
-                                       download
-                                       class="btn btn-outline-dark btn-sm rounded-pill">
-                                        <i class="bi bi-download"></i>
-                                    </a>
-                                </div>
+
+                                <a href="{{ documento.pdf.url }}"
+                                   target="_blank"
+                                   class="btn btn-dark rounded-pill px-5 py-3">
+
+                                    📄 Ver PDF actual
+
+                                </a>
+
                             {% else %}
-                                <div class="flex-grow-1 rounded-3 d-flex align-items-center justify-content-center border border-dashed"
-                                     style="min-height:200px;">
-                                    <div class="text-center">
-                                        <i class="bi bi-file-earmark-pdf text-muted" style="font-size:2.5rem;"></i>
-                                        <p class="text-muted mb-0 mt-2 small">Sin PDF</p>
-                                    </div>
-                                </div>
+
+                                <button class="btn btn-secondary rounded-pill px-5 py-3"
+                                        disabled>
+
+                                    Sin PDF registrado
+
+                                </button>
+
                             {% endif %}
+
                         </div>
+
                     </div>
 
                 </div>
+
             </div>
+
         </div>
 
-        <!-- ====== RENOVACIÓN ====== -->
-        <div class="card shadow-sm border-0 rounded-4 mb-4">
-            <div class="card-body p-4">
-                <h5 class="fw-bold mb-3">
-                    <i class="bi bi-arrow-repeat me-2 text-success"></i>Renovación
-                </h5>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small text-uppercase text-muted">
+        <!-- Renovación -->
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Renovación
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
                             Nueva fecha de vencimiento
+
                         </label>
-                        <input type="date"
-                               name="fecha_vencimiento"
-                               class="form-control rounded-3"
-                               value="{{ documento.fecha_vencimiento|date:'Y-m-d' }}"
-                               required>
+
+                        <input
+                            type="date"
+                            name="fecha_vencimiento"
+                            class="form-control rounded-pill"
+                            value="{{ documento.fecha_vencimiento|date:'Y-m-d' }}"
+                            required>
+
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small text-uppercase text-muted">
-                            Nueva imagen
-                            <span class="fw-normal text-lowercase">(opcional)</span>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nueva imagen (Opcional)
+
                         </label>
-                        <input type="file"
-                               name="imagen"
-                               id="id_imagen"
-                               class="form-control rounded-3"
-                               accept="image/*">
+
+                        <input
+                            type="file"
+                            name="imagen"
+                            id="id_imagen"
+                            class="form-control"
+                            accept="image/*">
+
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold small text-uppercase text-muted">
-                            Nuevo PDF
-                            <span class="fw-normal text-lowercase">(opcional)</span>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nuevo PDF (Opcional)
+
                         </label>
-                        <input type="file"
-                               name="pdf"
-                               id="id_pdf"
-                               class="form-control rounded-3"
-                               accept=".pdf">
+
+                        <input
+                            type="file"
+                            name="pdf"
+                            class="form-control"
+                            accept=".pdf">
+
                     </div>
+
                 </div>
 
-                <!-- Preview nueva imagen -->
-                <div id="previewImagenContenedor" class="mt-3 d-none">
-                    <div class="bg-light rounded-3 p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-eye me-1"></i>Vista previa nueva imagen
-                            </small>
-                            <button type="button"
-                                    id="btnQuitarImagen"
-                                    class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                <i class="bi bi-x-lg me-1"></i>Quitar
-                            </button>
-                        </div>
-                        <img id="previewImagen"
-                             class="img-fluid rounded-3 w-100"
-                             style="max-height:220px; object-fit:cover;"
-                             alt="Vista previa">
-                    </div>
+                <!-- Vista previa -->
+
+                <div class="mb-4">
+
+                    <img id="preview"
+                         class="img-fluid rounded-4 shadow d-none"
+                         style="max-height:250px;">
+
                 </div>
 
-                <!-- Preview nuevo PDF -->
-                <div id="previewPdfContenedor" class="mt-3 d-none">
-                    <div class="bg-light rounded-3 p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-eye me-1"></i>Vista previa nuevo PDF
-                            </small>
-                            <button type="button"
-                                    id="btnQuitarPdf"
-                                    class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                <i class="bi bi-x-lg me-1"></i>Quitar
-                            </button>
-                        </div>
-                        <iframe id="previewPdf"
-                                class="w-100 rounded-3"
-                                style="height:220px; border:none;"
-                                title="Vista previa PDF">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
+                <hr>
 
-        <!-- ====== BOTONES ====== -->
-        <div class="row g-3">
-            <div class="col-md-6">
-                <a href="{% url 'documentos:lista_documentos' %}"
-                   class="btn btn-outline-secondary rounded-pill w-100 py-3">
-                    <i class="bi bi-x-lg me-2"></i>Cancelar
-                </a>
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <a href="{% url 'documentos:lista_documentos' %}"
+                           class="btn btn-outline-secondary rounded-pill w-100 py-3">
+
+                            Cancelar
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success rounded-pill w-100 py-3 fw-bold">
+
+                            ♻ Renovar Documento
+
+                        </button>
+
+                    </div>
+
+                </div>
+
             </div>
-            <div class="col-md-6">
-                <button type="submit"
-                        class="btn btn-success rounded-pill w-100 py-3 fw-bold">
-                    <i class="bi bi-arrow-repeat me-2"></i>Renovar Documento
-                </button>
-            </div>
+
         </div>
 
     </form>
+
 </div>
 
-<!-- ====== MODAL AMPLIAR IMAGEN ====== -->
-{% if documento.imagen %}
-<div class="modal fade" id="modalImagen" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-dark border-0 rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title text-white">
-                    <i class="bi bi-image me-2"></i>Imagen del documento
-                </h5>
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar">
-                </button>
-            </div>
-            <div class="modal-body text-center pt-2">
-                <img src="{{ documento.imagen.url }}"
-                     class="img-fluid rounded-3"
-                     style="max-height:82vh; object-fit:contain;"
-                     alt="Imagen ampliada">
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% endblock %}
-
-{% block extra_js %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    // ── Preview nueva imagen ──
-    const inputImagen = document.getElementById("id_imagen");
-    const contenedorImg = document.getElementById("previewImagenContenedor");
-    const previewImg = document.getElementById("previewImagen");
-    const btnQuitarImg = document.getElementById("btnQuitarImagen");
+const imagen=document.getElementById("id_imagen");
 
-    if (inputImagen) {
-        inputImagen.addEventListener("change", function () {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewImg.src = e.target.result;
-                    contenedorImg.classList.remove("d-none");
-                };
-                reader.readAsDataURL(this.files[0]);
-            } else {
-                contenedorImg.classList.add("d-none");
+if(imagen){
+
+    imagen.addEventListener("change",function(){
+
+        if(this.files.length){
+
+            const reader=new FileReader();
+
+            reader.onload=function(e){
+
+                const preview=document.getElementById("preview");
+
+                preview.src=e.target.result;
+
+                preview.classList.remove("d-none");
+
             }
-        });
-    }
 
-    if (btnQuitarImg) {
-        btnQuitarImg.addEventListener("click", function () {
-            inputImagen.value = "";
-            previewImg.src = "";
-            contenedorImg.classList.add("d-none");
-        });
-    }
+            reader.readAsDataURL(this.files[0]);
 
-    // ── Preview nuevo PDF ──
-    const inputPdf = document.getElementById("id_pdf");
-    const contenedorPdf = document.getElementById("previewPdfContenedor");
-    const previewPdf = document.getElementById("previewPdf");
-    const btnQuitarPdf = document.getElementById("btnQuitarPdf");
+        }
 
-    if (inputPdf) {
-        inputPdf.addEventListener("change", function () {
-            if (this.files && this.files[0]) {
-                const file = this.files[0];
-                if (file.type !== "application/pdf") {
-                    alert("Selecciona un archivo PDF válido.");
-                    this.value = "";
-                    return;
-                }
-                const url = URL.createObjectURL(file);
-                previewPdf.src = url;
-                contenedorPdf.classList.remove("d-none");
-            } else {
-                contenedorPdf.classList.add("d-none");
-            }
-        });
-    }
+    });
 
-    if (btnQuitarPdf) {
-        btnQuitarPdf.addEventListener("click", function () {
-            if (previewPdf.src) URL.revokeObjectURL(previewPdf.src);
-            inputPdf.value = "";
-            previewPdf.src = "";
-            contenedorPdf.classList.add("d-none");
-        });
-    }
+}
 
-});
 </script>
+
 {% endblock %}
