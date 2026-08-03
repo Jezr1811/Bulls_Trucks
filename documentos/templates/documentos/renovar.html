@@ -1,554 +1,344 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}
+Renovar Documento
+{% endblock %}
 
 {% block content %}
 
-<style>
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes shimmer {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-    }
-    @keyframes slideRight {
-        from { opacity: 0; transform: translateX(100%); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes slideOut {
-        from { opacity: 1; transform: translateX(0); }
-        to { opacity: 0; transform: translateX(100%); }
-    }
+<div class="container py-4">
 
-    :root {
-        --accent: #2F80ED;
-        --accent-hover: #1a6fd4;
-        --border: #eef2f7;
-        --fg: #1f2937;
-        --muted: #9ca3af;
-    }
+    <!-- Encabezado -->
 
-    /* ============ WRAPPER ============ */
-    .form-wrapper {
-        max-width: 620px;
-        margin: 0 auto;
-        padding: 2rem 1.5rem;
-    }
+    <div class="d-flex align-items-center mb-4">
 
-    /* ============ BACK LINK ============ */
-    .form-back {
-        display: inline-flex;
-        align-items: center;
-        gap: .45rem;
-        font-size: .82rem;
-        font-weight: 500;
-        color: var(--muted);
-        text-decoration: none;
-        margin-bottom: 1.25rem;
-        transition: color .2s;
-        animation: slideUp .4s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    .form-back:hover { color: var(--accent); }
-    .form-back i { font-size: .75rem; }
+        <a href="{% url 'documentos:lista_documentos' %}"
+           class="btn btn-outline-secondary rounded-pill me-3 px-4">
 
-    /* ============ HEADER ============ */
-    .page-header-bar {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-bottom: 1.5rem;
-        animation: slideUp .45s cubic-bezier(.22,1,.36,1) .03s forwards;
-        opacity: 0;
-    }
-    @media (min-width: 640px) {
-        .page-header-bar {
-            flex-direction: row;
-            align-items: flex-end;
-            justify-content: space-between;
-        }
-    }
+            <i class="bi bi-arrow-left"></i>
+            Volver
 
-    .accent-bar {
-        width: 6px;
-        height: 2rem;
-        border-radius: 99px;
-        background: linear-gradient(to bottom, #60a5fa, #2F80ED);
-        flex-shrink: 0;
-    }
+        </a>
 
-    .page-title {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.85rem;
-        font-weight: 800;
-        color: var(--fg);
-        margin: 0;
-        letter-spacing: -.03em;
-        line-height: 1.15;
-    }
-    .page-subtitle {
-        font-size: .85rem;
-        color: var(--muted);
-        margin: .15rem 0 0;
-    }
+        <div>
 
-    /* ============ CARD ============ */
-    .form-card {
-        background: #fff;
-        border-radius: 18px;
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 20px rgba(0,0,0,.06);
-        overflow: hidden;
-        animation: slideUp .5s cubic-bezier(.22,1,.36,1) .08s forwards;
-        opacity: 0;
-        position: relative;
-    }
+            <h2 class="fw-bold mb-0">
 
-    .form-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #2F80ED, #60a5fa, #2F80ED);
-        background-size: 200% 100%;
-        animation: shimmer 3s ease-in-out infinite;
-    }
+                Renovar Documento
 
-    /* ============ CARD HEADER ============ */
-    .card-header-custom {
-        padding: 1.25rem 1.75rem;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        gap: .7rem;
-    }
+            </h2>
 
-    .card-header-icon {
-        width: 40px; height: 40px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #1e3a5f, #2c5282);
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.05rem;
-        flex-shrink: 0;
-        box-shadow: 0 4px 12px rgba(47,128,237,.25);
-    }
+            <small class="text-muted">
 
-    .card-header-custom h2 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--fg);
-        margin: 0;
-    }
-    .card-header-custom p {
-        font-size: .8rem;
-        color: var(--muted);
-        margin: .1rem 0 0;
-    }
+                Actualiza la vigencia y los archivos del documento.
 
-    /* ============ CARD BODY ============ */
-    .card-body-custom {
-        padding: 1.35rem 1.75rem;
-    }
+            </small>
 
-    /* Section labels */
-    .section-label {
-        display: flex;
-        align-items: center;
-        gap: .4rem;
-        font-size: .72rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: var(--muted);
-        margin-bottom: .85rem;
-        margin-top: 1.15rem;
-    }
-    .section-label:first-child { margin-top: 0; }
-    .section-label i { font-size: .8rem; color: var(--accent); }
-
-    .section-divider {
-        border: none;
-        border-top: 1px dashed #e5e7eb;
-        margin: 1rem 0;
-    }
-
-    /* Grid */
-    .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-    .form-field { margin-bottom: 0; }
-    .form-field.full { grid-column: 1 / -1; }
-
-    /* Labels */
-    .form-field label {
-        display: flex;
-        align-items: center;
-        gap: .25rem;
-        font-size: .82rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: .4rem;
-    }
-    .form-field .req { color: #ef4444; font-weight: 700; font-size: .9rem; line-height: 1; }
-
-    /* Inputs */
-    .form-field input[type="text"],
-    .form-field input[type="email"],
-    .form-field input[type="tel"],
-    .form-field input[type="password"],
-    .form-field input[type="number"],
-    .form-field input[type="date"],
-    .form-field select,
-    .form-field textarea {
-        width: 100%;
-        padding: .6rem .9rem;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: .875rem;
-        font-family: 'Inter', sans-serif;
-        color: var(--fg);
-        background: #fff;
-        transition: border-color .2s, box-shadow .2s, background .2s;
-    }
-    .form-field input:hover,
-    .form-field select:hover,
-    .form-field textarea:hover {
-        border-color: #d1d5db;
-    }
-    .form-field input:focus,
-    .form-field select:focus,
-    .form-field textarea:focus {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(47,128,237,.1);
-        outline: none;
-        background: #f0f9ff;
-    }
-    .form-field input::placeholder,
-    .form-field textarea::placeholder { color: #d1d5db; }
-
-    /* Django error list */
-    .form-field .errorlist {
-        list-style: none;
-        padding: 0;
-        margin: .3rem 0 0;
-    }
-    .form-field .errorlist li {
-        font-size: .78rem;
-        color: #ef4444;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: .3rem;
-    }
-    .form-field .errorlist li::before {
-        content: '\F33A';
-        font-family: 'bootstrap-icons';
-        font-size: .7rem;
-    }
-
-    /* Help text */
-    .form-field .helptext {
-        display: flex;
-        align-items: center;
-        gap: .25rem;
-        font-size: .73rem;
-        color: var(--muted);
-        margin-top: .3rem;
-        font-style: italic;
-    }
-
-    /* ============ ERROR BOX ============ */
-    .form-errors {
-        background: #fef2f2;
-        border: 1px solid #fecaca;
-        border-radius: 12px;
-        padding: .85rem 1rem;
-        margin-bottom: 1.15rem;
-    }
-    .form-errors h6 {
-        color: #b91c1c;
-        font-size: .85rem;
-        font-weight: 700;
-        margin: 0 0 .35rem;
-        display: flex;
-        align-items: center;
-        gap: .35rem;
-    }
-    .form-errors ul {
-        margin: 0;
-        padding-left: 1.1rem;
-        font-size: .8rem;
-        color: #991b1b;
-    }
-
-    /* ============ FOOTER ============ */
-    .card-footer-custom {
-        padding: 1.25rem 1.75rem;
-        border-top: 1px solid var(--border);
-        background: #fafbfc;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: .75rem;
-    }
-
-    .btn-cancel {
-        background: transparent;
-        color: #6b7280;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 12px;
-        padding: .6rem 1.3rem;
-        font-weight: 500;
-        font-size: .875rem;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all .2s;
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        font-family: 'Inter', sans-serif;
-    }
-    .btn-cancel:hover {
-        background: #f3f4f6;
-        color: #374151;
-        border-color: #d1d5db;
-    }
-
-    .btn-submit {
-        background: linear-gradient(135deg, #2F80ED, #1a6fd4);
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: .6rem 1.5rem;
-        font-weight: 600;
-        font-size: .875rem;
-        cursor: pointer;
-        transition: all .2s;
-        display: inline-flex;
-        align-items: center;
-        gap: .4rem;
-        box-shadow: 0 4px 14px rgba(47,128,237,.25);
-        font-family: 'Inter', sans-serif;
-    }
-    .btn-submit:hover {
-        background: linear-gradient(135deg, #1a6fd4, #155ab0);
-        box-shadow: 0 6px 20px rgba(47,128,237,.35);
-        transform: translateY(-1px);
-    }
-    .btn-submit:active { transform: translateY(0); }
-
-    /* ============ TOAST ============ */
-    #toast-container {
-        position: fixed; top: 90px; right: 1rem; z-index: 9999;
-        display: flex; flex-direction: column; gap: .65rem;
-        pointer-events: none;
-    }
-    .toast-item {
-        pointer-events: auto;
-        display: flex; align-items: center; gap: .65rem;
-        background: #fff; border-radius: 12px;
-        box-shadow: 0 8px 30px rgba(0,0,0,.12);
-        padding: .75rem 1rem; min-width: 260px; max-width: 380px;
-        border-left: 4px solid; font-size: .85rem; color: #374151;
-    }
-    .toast-item.toast-success { border-left-color: #16a34a; }
-    .toast-item.toast-error { border-left-color: #ef4444; }
-    .toast-item.toast-info { border-left-color: #2F80ED; }
-    .toast-dismiss {
-        background: none; border: none; color: #d1d5db;
-        cursor: pointer; font-size: .85rem; padding: 2px;
-        transition: color .15s;
-    }
-    .toast-dismiss:hover { color: #6b7280; }
-    .toast-enter { animation: slideRight .4s cubic-bezier(.22,1,.36,1) forwards; }
-    .toast-exit { animation: slideOut .3s ease forwards; }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 575.98px) {
-        .form-grid { grid-template-columns: 1fr; }
-        .form-wrapper { padding: 1.25rem 1rem; }
-        .card-header-custom,
-        .card-body-custom,
-        .card-footer-custom {
-            padding-left: 1.25rem;
-            padding-right: 1.25rem;
-        }
-    }
-</style>
-
-
-<!-- Toast container -->
-<div id="toast-container" aria-live="polite"></div>
-
-<div class="form-wrapper">
-
-    <!-- Back link -->
-    <a href="{% url 'conductores:lista_conductores' %}" class="form-back">
-        <i class="bi bi-arrow-left"></i>
-        Volver a Conductores
-    </a>
-
-    <!-- Header -->
-    <div class="page-header-bar">
-        <div class="d-flex align-items-center gap-2">
-            <div class="accent-bar"></div>
-            <div>
-                <h1 class="page-title">
-                    {% if editar %}Editar Conductor{% else %}Nuevo Conductor{% endif %}
-                </h1>
-                <p class="page-subtitle">
-                    {% if editar %}Modifica la información del conductor{% else %}Registra un nuevo conductor{% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card -->
-    <div class="form-card">
-
-        <!-- Card header -->
-        <div class="card-header-custom">
-            <div class="card-header-icon">
-                {% if editar %}
-                <i class="bi bi-pencil"></i>
-                {% else %}
-                <i class="bi bi-person-plus"></i>
-                {% endif %}
-            </div>
-            <div>
-                <h2>
-                    {% if editar %}Modificar Datos{% else %}Formulario de Registro{% endif %}
-                </h2>
-                <p>
-                    {% if editar %}Edita los campos que deseas actualizar{% else %}Completa todos los campos obligatorios{% endif %}
-                </p>
-            </div>
-        </div>
-
-        <!-- Card body -->
-        <div class="card-body-custom">
-            <form method="POST">
-                {% csrf_token %}
-
-                {% if form.errors %}
-                <div class="form-errors">
-                    <h6><i class="bi bi-exclamation-triangle"></i> Corrige los siguientes errores</h6>
-                    <ul>
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                        {% for error in form.non_field_errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-
-                <!-- Section: Información personal -->
-                <div class="section-label">
-                    <i class="bi bi-person-vcard"></i>
-                    Información Personal
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-field">
-                        <label>Nombre completo <span class="req">*</span></label>
-                        {{ form.nombre }}
-                    </div>
-                    <div class="form-field">
-                        <label>Licencia <span class="req">*</span></label>
-                        {{ form.licencia }}
-                    </div>
-                    <div class="form-field">
-                        <label>Teléfono <span class="req">*</span></label>
-                        {{ form.telefono }}
-                    </div1>
-                    <div class="form-field">
-                        <label>Correo electrónico <span class="req">*</span></label>
-                        {{ form.correo }}
-                    </div>
-                </div>
-
-                <hr class="section-divider">
-
-                <!-- Section: Estado -->
-                <div class="section-label">
-                    <i class="bi bi-toggle-on"></i>
-                    Estado del Conductor
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-field">
-                        <label>Estado</label>
-                        {{ form.estado }}
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Footer -->
-            <div class="card-footer-custom">
-                <a href="{% url 'conductores:lista_conductores' %}" class="btn-cancel">
-                    <i class="bi bi-x-lg"></i>
-                    Cancelar
-                </a>
-                <button type="submit" class="btn-submit">
-                    <i class="bi bi-check-lg"></i>
-                    {% if editar %}Actualizar{% else %}Guardar{% endif %}
-                </button>
-            </div>
-
-            </form>
         </div>
 
     </div>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        <!-- Información -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Información actual
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p><strong>Tipo:</strong> {{ documento.get_tipo_display }}</p>
+
+                        <p><strong>Vehículo:</strong> {{ documento.vehiculo }}</p>
+
+                        <p><strong>Conductor:</strong> {{ documento.conductor }}</p>
+
+                        <p><strong>Número:</strong> {{ documento.numero }}</p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <p><strong>Fecha expedición:</strong> {{ documento.fecha_expedicion }}</p>
+
+                        <p><strong>Fecha vencimiento:</strong> {{ documento.fecha_vencimiento }}</p>
+
+                        <p>
+
+                            <strong>Estado:</strong>
+
+                            {% if documento.estado == "vigente" %}
+
+                                <span class="badge bg-success">
+
+                                    Vigente
+
+                                </span>
+
+                            {% elif documento.estado == "proximo" %}
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Próximo a vencer
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-danger">
+
+                                    Vencido
+
+                                </span>
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Archivos -->
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Archivos actuales
+
+                </h4>
+
+                <div class="row">
+
+                    <!-- Imagen -->
+
+                    <div class="col-md-6 mb-3">
+
+                        {% if documento.imagen %}
+
+                            <img src="{{ documento.imagen.url }}"
+                                 class="img-fluid rounded-4 shadow w-100"
+                                 style="height:250px;object-fit:cover;">
+
+                        {% else %}
+
+                            <div class="border rounded-4 bg-light text-center d-flex flex-column justify-content-center align-items-center"
+                                 style="height:250px;">
+
+                                <i class="bi bi-image text-secondary"
+                                   style="font-size:70px;"></i>
+
+                                <p class="text-muted mt-3 mb-0">
+
+                                    No hay imagen registrada
+
+                                </p>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- PDF -->
+
+                    <div class="col-md-6 mb-3">
+
+                        <div class="border rounded-4 bg-light d-flex justify-content-center align-items-center"
+                             style="height:250px;">
+
+                            {% if documento.pdf %}
+
+                                <a href="{{ documento.pdf.url }}"
+                                   target="_blank"
+                                   class="btn btn-dark rounded-pill px-5 py-3">
+
+                                    📄 Ver PDF actual
+
+                                </a>
+
+                            {% else %}
+
+                                <button class="btn btn-secondary rounded-pill px-5 py-3"
+                                        disabled>
+
+                                    Sin PDF registrado
+
+                                </button>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Renovación -->
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-4">
+
+                    Renovación
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nueva fecha de vencimiento
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_vencimiento"
+                            class="form-control rounded-pill"
+                            value="{{ documento.fecha_vencimiento|date:'Y-m-d' }}"
+                            required>
+
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nueva imagen (Opcional)
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="imagen"
+                            id="id_imagen"
+                            class="form-control"
+                            accept="image/*">
+
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+
+                        <label class="form-label">
+
+                            Nuevo PDF (Opcional)
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="pdf"
+                            class="form-control"
+                            accept=".pdf">
+
+                    </div>
+
+                </div>
+
+                <!-- Vista previa -->
+
+                <div class="mb-4">
+
+                    <img id="preview"
+                         class="img-fluid rounded-4 shadow d-none"
+                         style="max-height:250px;">
+
+                </div>
+
+                <hr>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <a href="{% url 'documentos:lista_documentos' %}"
+                           class="btn btn-outline-secondary rounded-pill w-100 py-3">
+
+                            Cancelar
+
+                        </a>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success rounded-pill w-100 py-3 fw-bold">
+
+                            ♻ Renovar Documento
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
 </div>
 
-
 <script>
-    function showToast(message, type) {
-        type = type || 'info';
-        var container = document.getElementById('toast-container');
-        var iconMap = {
-            success: '<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:1.1rem;"></i>',
-            error: '<i class="bi bi-x-circle-fill" style="color:#ef4444;font-size:1.1rem;"></i>',
-            info: '<i class="bi bi-info-circle-fill" style="color:#2F80ED;font-size:1.1rem;"></i>'
-        };
-        var toast = document.createElement('div');
-        toast.className = 'toast-item toast-enter toast-' + type;
-        toast.innerHTML = (iconMap[type] || iconMap.info) +
-            '<span style="flex:1;">' + message + '</span>' +
-            '<button class="toast-dismiss" onclick="dismissToast(this)" aria-label="Cerrar"><i class="bi bi-x"></i></button>';
-        container.appendChild(toast);
-        setTimeout(function() { dismissToast(toast.querySelector('button')); }, 3500);
-    }
 
-    function dismissToast(btn) {
-        var toast = btn.closest('.toast-item');
-        if (!toast) return;
-        toast.classList.remove('toast-enter');
-        toast.classList.add('toast-exit');
-        setTimeout(function() { toast.remove(); }, 300);
-    }
+const imagen=document.getElementById("id_imagen");
 
-    {% if messages %}
-        {% for message in messages %}
-            {% if message.tags == 'success' %}
-                showToast('{{ message|escapejs }}', 'success');
-            {% elif message.tags == 'error' %}
-                showToast('{{ message|escapejs }}', 'error');
-            {% else %}
-                showToast('{{ message|escapejs }}', 'info');
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+if(imagen){
+
+    imagen.addEventListener("change",function(){
+
+        if(this.files.length){
+
+            const reader=new FileReader();
+
+            reader.onload=function(e){
+
+                const preview=document.getElementById("preview");
+
+                preview.src=e.target.result;
+
+                preview.classList.remove("d-none");
+
+            }
+
+            reader.readAsDataURL(this.files[0]);
+
+        }
+
+    });
+
+}
+
 </script>
 
 {% endblock %}
