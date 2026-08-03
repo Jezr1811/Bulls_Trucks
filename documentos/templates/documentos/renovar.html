@@ -212,48 +212,76 @@
                 </div>
 
                 <!-- Preview nueva imagen -->
-                <div id="previewImagenContenedor" class="mt-3 d-none">
-                    <div class="bg-light rounded-3 p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-eye me-1"></i>Vista previa nueva imagen
-                            </small>
-                            <button type="button"
-                                    id="btnQuitarImagen"
-                                    class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                <i class="bi bi-x-lg me-1"></i>Quitar
-                            </button>
-                        </div>
-                        <img id="previewImagen"
-                             class="img-fluid rounded-3 w-100"
-                             style="max-height:220px; object-fit:cover;"
-                             alt="Vista previa">
+                <!-- Imagen -->
+                <div class="col-lg-6">
+                    <div class="border rounded-4 p-3 h-100">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-image me-2"></i>Imagen
+                        </h6>
+
+                        {% if documento.imagen %}
+                            <img src="{{ documento.imagen.url }}"
+                                alt="Imagen del documento"
+                                class="img-fluid rounded-3 w-100"
+                                style="max-height:300px; object-fit:cover;">
+
+                            <div class="text-end mt-2">
+                                <button type="button"
+                                        class="btn btn-dark btn-sm rounded-pill"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalImagen">
+                                    <i class="bi bi-zoom-in me-1"></i>Ampliar
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="d-flex flex-column justify-content-center align-items-center text-muted"
+                                style="height:300px;">
+                                <i class="bi bi-image fs-1 mb-3"></i>
+                                <h6 class="mb-1">No hay imagen cargada</h6>
+                                <small>Este documento aún no tiene una imagen.</small>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Preview nuevo PDF -->
-                <div id="previewPdfContenedor" class="mt-3 d-none">
-                    <div class="bg-light rounded-3 p-3">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <small class="text-muted">
-                                <i class="bi bi-eye me-1"></i>Vista previa nuevo PDF
-                            </small>
-                            <button type="button"
-                                    id="btnQuitarPdf"
-                                    class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                                <i class="bi bi-x-lg me-1"></i>Quitar
-                            </button>
-                        </div>
-                        <iframe id="previewPdf"
-                                class="w-100 rounded-3"
-                                style="height:220px; border:none;"
-                                title="Vista previa PDF">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-        </div>
+                <!-- PDF -->
+<div class="col-lg-6">
+    <div class="border rounded-4 p-3 h-100">
+        <h6 class="fw-bold mb-3">
+            <i class="bi bi-file-earmark-pdf me-2"></i>PDF
+        </h6>
 
+        {% if documento.archivo_pdf %}
+            <iframe src="{{ documento.archivo_pdf.url }}"
+                    class="w-100 rounded-3"
+                    style="height:300px; border:none;">
+            </iframe>
+
+            <div class="mt-2 d-flex gap-2">
+                <a href="{{ documento.archivo_pdf.url }}"
+                   target="_blank"
+                   class="btn btn-outline-primary rounded-pill flex-fill">
+                    <i class="bi bi-box-arrow-up-right me-1"></i>
+                    Abrir en nueva pestaña
+                </a>
+
+                <a href="{{ documento.archivo_pdf.url }}"
+                   download
+                   class="btn btn-outline-secondary rounded-pill">
+                    <i class="bi bi-download"></i>
+                </a>
+            </div>
+        {% else %}
+            <div class="d-flex flex-column justify-content-center align-items-center text-muted"
+                 style="height:300px;">
+                <i class="bi bi-file-earmark-pdf fs-1 mb-3"></i>
+                <h6 class="mb-1">No hay PDF cargado</h6>
+                <small>Este documento aún no tiene un archivo PDF.</small>
+            </div>
+        {% endif %}
+    </div>
+</div>
         <!-- ====== BOTONES ====== -->
         <div class="row g-3">
             <div class="col-md-6">
