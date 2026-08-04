@@ -5,11 +5,21 @@ Django settings for Proyecto_Personal project.
 import os
 from pathlib import Path
 
+
 import dj_database_url
+from dotenv import load_dotenv
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
+    "SECURE": True,
+} 
 # ===========================
 # SEGURIDAD
 # ===========================
@@ -33,6 +43,9 @@ ALLOWED_HOSTS = [
 # ===========================
 
 INSTALLED_APPS = [
+      "cloudinary_storage",
+    "cloudinary",
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -53,7 +66,7 @@ INSTALLED_APPS = [
     "contabilidad",
 ]
 
-
+ 
 # ===========================
 # MIDDLEWARE
 # ===========================
@@ -172,8 +185,9 @@ STATICFILES_STORAGE = (
 # ARCHIVOS MEDIA
 # ===========================
 
-MEDIA_URL = "/media/"
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
+MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 
