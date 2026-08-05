@@ -1,4 +1,5 @@
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 from viajes.models import Viaje
 from vehiculos.models import Vehiculo
@@ -26,8 +27,8 @@ class Documento(models.Model):
     vehiculo = models.ForeignKey(
         Vehiculo,
         on_delete=models.CASCADE,
-        null=True,
         blank=True,
+        null=True
     )
 
     conductor = models.ForeignKey(
@@ -54,14 +55,17 @@ class Documento(models.Model):
         null=True
     )
 
-    imagen = models.ImageField(
-        upload_to="documentos/",
+    # Imagen almacenada en Cloudinary
+    imagen = CloudinaryField(
+        "imagen",
         blank=True,
         null=True
     )
 
-    pdf = models.FileField(
-        upload_to="documentos/",
+    # PDF almacenado en Cloudinary
+    pdf = CloudinaryField(
+        "pdf",
+        resource_type="raw",
         blank=True,
         null=True
     )
