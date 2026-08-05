@@ -8,20 +8,13 @@ from pathlib import Path
 
 import dj_database_url
 from dotenv import load_dotenv
-import cloudinary
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
-
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
 # ===========================
 # SEGURIDAD
 # ===========================
@@ -45,8 +38,7 @@ ALLOWED_HOSTS = [
 # ===========================
 
 INSTALLED_APPS = [
-
-    "cloudinary",
+  
 
     "django.contrib.admin",
     "django.contrib.auth",
@@ -56,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
 
+    'storages',
     "usuarios",
     "conductores",
     "vehiculos",
@@ -170,17 +163,60 @@ NUMBER_GROUPING = 3
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
 # ===========================
-# ARCHIVOS MEDIA
+# CLOUDFLARE R2
 # ===========================
 
+AWS_ACCESS_KEY_ID = os.getenv("R2_ACCESS_KEY_ID")
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+AWS_SECRET_ACCESS_KEY = os.getenv("R2_SECRET_ACCESS_KEY")
 
+AWS_STORAGE_BUCKET_NAME = os.getenv("R2_BUCKET_NAME")
+
+AWS_S3_ENDPOINT_URL = os.getenv("R2_ENDPOINT_URL")
+
+AWS_S3_REGION_NAME = os.getenv("R2_REGION", "auto")
+
+AWS_QUERYSTRING_AUTH = False
+
+AWS_DEFAULT_ACL = None
+
+AWS_S3_FILE_OVERWRITE = False
+
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+
+AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
+
+# Si habilitas la Public Development URL de R2,
+# reemplaza el valor por tu dominio r2.dev
+# Ejemplo:
+# AWS_S3_CUSTOM_DOMAIN = "pub-xxxxxxxxxxxxxxxx.r2.dev"
+#
+# Si todavía no la has habilitado, deja esta línea comentada.
+
+# AWS_S3_CUSTOM_DOMAIN = "pub-xxxxxxxxxxxxxxxx.r2.dev"
+
+# ===========================
+# STORAGE
+# ===========================
+
+STORAGES = {
+    "default": {
+        "BACKEND": "Proyecto_Personal.storage_backends.MediaStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
+# ===========================
+# MEDIA
+# ===========================
+
+if AWS_S3_CUSTOM_DOMAIN:
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+else:
+    MEDIA_URL = "/media/"
 
 # ===========================
 # LOGIN
@@ -192,13 +228,11 @@ LOGIN_REDIRECT_URL = "usuarios:dashboard"
 
 LOGOUT_REDIRECT_URL = "usuarios:login"
 
-
 # ===========================
 # DEFAULT PK
 # ===========================
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 
 # ===========================
 # SEGURIDAD PRODUCCIÓN
